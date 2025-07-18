@@ -1,0 +1,19 @@
+{
+  "name": "video",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"yarn run server\" \"yarn run client\"",
+    "server": "cd server && python3 main.py",
+    "client": "cd client && yarn dev",
+    "install-all": "cd server && pip install -r requirements.txt && cd ../client && yarn install",
+    "build": "cd client && yarn build"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
