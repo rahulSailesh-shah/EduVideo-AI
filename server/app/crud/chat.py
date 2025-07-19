@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy.orm import Session
 from typing import Optional
 from app.models.chat import Chat
@@ -14,7 +15,9 @@ def get_chats_by_user_id(db: Session, user_id: int) -> list[Chat]:
 def create_chat(db: Session, chat: ChatCreate, user_id: int) -> Chat:
     db_chat = Chat(
         title=chat.title,
-        user_id=user_id
+        user_id=user_id,
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
     )
     db.add(db_chat)
     db.commit()

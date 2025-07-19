@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy.orm import Session
 from typing import Optional, List
 from app.models.message import Message
@@ -14,7 +15,9 @@ def create_message(db: Session, message: MessageCreate) -> Message:
     db_message = Message(
         content=message.content,
         role=message.role,
-        chat_id=message.chat_id
+        chat_id=message.chat_id,
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
     )
     db.add(db_message)
     db.commit()
