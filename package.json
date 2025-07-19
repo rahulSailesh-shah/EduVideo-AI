@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"yarn run server\" \"yarn run client\"",
-    "server": "cd server && python3 main.py",
+    "server": "cd server && python3 -m app.main",
     "client": "cd client && yarn dev",
     "install-all": "cd server && pip install -r requirements.txt && cd ../client && yarn install",
     "build": "cd client && yarn build"
