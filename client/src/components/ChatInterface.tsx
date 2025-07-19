@@ -1,15 +1,16 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, User, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate, useParams } from "react-router-dom";
 
 interface Message {
   id: string;
   content: string;
-  type: 'user' | 'assistant';
-  timestamp: Date;
+  role: "user" | "assistant";
+  created_at: string;
 }
 
 interface ChatInterfaceProps {
@@ -17,42 +18,96 @@ interface ChatInterfaceProps {
   isGenerating: boolean;
 }
 
-export const ChatInterface = ({ onMessageSent, isGenerating }: ChatInterfaceProps) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      content: 'Hello! I can help you create educational videos. Describe what you\'d like to create and I\'ll generate it for you.',
-      type: 'assistant',
-      timestamp: new Date()
-    }
-  ]);
+export const ChatInterface = ({
+  onMessageSent,
+  isGenerating,
+}: ChatInterfaceProps) => {
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const { projectId } = useParams();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isGenerating) return;
+  if (!projectId) {
+    navigate("/");
+  }
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      content: input,
-      type: 'user',
-      timestamp: new Date()
+  const token =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyYWh1bCIsImV4cCI6MTc1MjkyNDk3N30.cRbS0TXNfwJbpfjCcsNJIRMVzKjr0Xds2Uxd67G0eR4";
+  const user_id = "1";
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      setIsLoading(true);
+      try {
+        const res = await fetch(
+          `http://localhost:8000/api/messages/chat/${projectId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (!res.ok) {
+          toast({
+            title: "Error",
+            description: "Failed to load messages.",
+          });
+          navigate("/");
+          return;
+        }
+        const data = await res.json();
+        setMessages(data);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to load messages.",
+        });
+        navigate("/");
+      } finally {
+        setIsLoading(false);
+      }
     };
+    fetchMessages();
+  }, [navigate, projectId, toast]);
 
-    setMessages(prev => [...prev, userMessage]);
-    onMessageSent(input);
-    setInput("");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
 
-    // Add assistant response
-    setTimeout(() => {
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: "I'm generating your educational video. This will take a moment...",
-        type: 'assistant',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, assistantMessage]);
-    }, 500);
+    try {
+      const res = await fetch(`http://localhost:8000/api/messages`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          content: input,
+          role: "user",
+          chat_id: projectId,
+        }),
+      });
+      if (!res.ok) {
+        toast({
+          title: "Error",
+          description: "Failed to send message.",
+        });
+        return;
+      }
+      const data = await res.json();
+      console.log("Message sent:", data);
+      setMessages((prev) => [...prev, data]);
+      setInput("");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send message.",
+      });
+      return;
+    }
   };
 
   return (
@@ -64,27 +119,31 @@ export const ChatInterface = ({ onMessageSent, isGenerating }: ChatInterfaceProp
             key={message.id}
             className={cn(
               "flex gap-3 max-w-4xl",
-              message.type === 'user' ? "ml-auto flex-row-reverse" : ""
+              message.role === "user" ? "ml-auto flex-row-reverse" : ""
             )}
           >
-            <div className={cn(
-              "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-              message.type === 'user' 
-                ? "bg-primary text-primary-foreground" 
-                : "bg-muted text-muted-foreground"
-            )}>
-              {message.type === 'user' ? (
+            <div
+              className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
+                message.role === "user"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground"
+              )}
+            >
+              {message.role === "user" ? (
                 <User className="w-4 h-4" />
               ) : (
                 <Bot className="w-4 h-4" />
               )}
             </div>
-            <div className={cn(
-              "rounded-lg px-4 py-2 max-w-[80%]",
-              message.type === 'user'
-                ? "bg-primary text-primary-foreground ml-2"
-                : "bg-muted text-muted-foreground mr-2"
-            )}>
+            <div
+              className={cn(
+                "rounded-lg px-4 py-2 max-w-[80%]",
+                message.role === "user"
+                  ? "bg-primary text-primary-foreground ml-2"
+                  : "bg-muted text-muted-foreground mr-2"
+              )}
+            >
               <p className="text-sm">{message.content}</p>
             </div>
           </div>
@@ -97,9 +156,18 @@ export const ChatInterface = ({ onMessageSent, isGenerating }: ChatInterfaceProp
             <div className="bg-muted text-muted-foreground rounded-lg px-4 py-2 mr-2">
               <div className="flex items-center gap-2">
                 <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                  <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  <div
+                    className="w-2 h-2 bg-current rounded-full animate-bounce"
+                    style={{ animationDelay: "0ms" }}
+                  ></div>
+                  <div
+                    className="w-2 h-2 bg-current rounded-full animate-bounce"
+                    style={{ animationDelay: "150ms" }}
+                  ></div>
+                  <div
+                    className="w-2 h-2 bg-current rounded-full animate-bounce"
+                    style={{ animationDelay: "300ms" }}
+                  ></div>
                 </div>
                 <span className="text-sm">Generating...</span>
               </div>
@@ -117,14 +185,14 @@ export const ChatInterface = ({ onMessageSent, isGenerating }: ChatInterfaceProp
             placeholder="Describe the educational video you'd like to create..."
             className="min-h-[60px] max-h-[120px] resize-none"
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
+              if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
                 handleSubmit(e);
               }
             }}
           />
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={!input.trim() || isGenerating}
             className="self-end"
           >

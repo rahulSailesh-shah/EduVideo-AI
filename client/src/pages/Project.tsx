@@ -15,7 +15,7 @@ const Project = () => {
   const handleMessageSent = async (message: string) => {
     setIsGenerating(true);
     setHasVideo(false);
-    
+
     toast({
       title: "Generation Started",
       description: "Your educational video is being created...",
@@ -43,11 +43,15 @@ const Project = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Navbar onCreateNew={handleCreateNew} onBack={handleBack} showBack={true} />
-      
+      <Navbar
+        onCreateNew={handleCreateNew}
+        onBack={handleBack}
+        showBack={true}
+      />
+
       <div className="flex flex-1">
         {/* Chat Interface */}
-        <div className="w-96 border-r border-border">
+        <div className="w-1/3 border-r border-border">
           <ChatInterface
             onMessageSent={handleMessageSent}
             isGenerating={isGenerating}
@@ -55,10 +59,7 @@ const Project = () => {
         </div>
 
         {/* Main Content Area */}
-        <MainContent
-          isGenerating={isGenerating}
-          hasVideo={hasVideo}
-        />
+        <MainContent isGenerating={isGenerating} hasVideo={hasVideo} />
       </div>
     </div>
   );
