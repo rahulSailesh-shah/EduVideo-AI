@@ -16,11 +16,29 @@ interface Message {
 interface ChatInterfaceProps {
   onMessageSent: (message: string) => void;
   isGenerating: boolean;
+  setCode: (code: string) => void;
+}
+
+function extractCodeAndExplanation(input: string): {
+  code: string;
+  explanation: string;
+} {
+  console.log("Extracting code and explanation from input:", input);
+
+  const codeMatch = input.match(/```python([\s\S]*?)```/);
+  const textMatch = input.match(/```text([\s\S]*?)```/);
+  console.log("Code match:", codeMatch);
+  console.log("Explanation match:", textMatch);
+  return {
+    code: codeMatch ? codeMatch[1].trim() : "",
+    explanation: textMatch ? textMatch[1].trim() : "",
+  };
 }
 
 export const ChatInterface = ({
   onMessageSent,
   isGenerating,
+  setCode,
 }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -34,7 +52,7 @@ export const ChatInterface = ({
   }
 
   const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyYWh1bCIsImV4cCI6MTc1MjkyNDk3N30.cRbS0TXNfwJbpfjCcsNJIRMVzKjr0Xds2Uxd67G0eR4";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyYWh1bCIsImV4cCI6MTc1MjkyNTg4OH0.o6yI-5W_Xcig32eM1c5nL73Zg9_Nw_Sm9M0TRhgcqpg";
   const user_id = "1";
 
   useEffect(() => {
@@ -59,6 +77,19 @@ export const ChatInterface = ({
           return;
         }
         const data = await res.json();
+
+        const lastAssistantMessage = [...data]
+          .reverse()
+          .find((msg: Message) => msg.role === "assistant");
+        if (lastAssistantMessage) {
+          const { code, explanation } = extractCodeAndExplanation(
+            lastAssistantMessage.content
+          );
+          if (code) {
+            setCode(code);
+          }
+        }
+
         setMessages(data);
       } catch (error) {
         toast({
@@ -71,11 +102,20 @@ export const ChatInterface = ({
       }
     };
     fetchMessages();
-  }, [navigate, projectId, toast]);
+  }, [navigate, projectId, setCode, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
+
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      content: input,
+      role: "user",
+      created_at: new Date().toISOString(),
+    };
+
+    setMessages((prev) => [...prev, newMessage]);
 
     try {
       const res = await fetch(`http://localhost:8000/api/messages`, {
@@ -98,7 +138,10 @@ export const ChatInterface = ({
         return;
       }
       const data = await res.json();
-      console.log("Message sent:", data);
+      const { code, explanation } = extractCodeAndExplanation(data.content);
+      if (code) {
+        setCode(code);
+      }
       setMessages((prev) => [...prev, data]);
       setInput("");
     } catch (error) {
@@ -144,7 +187,15 @@ export const ChatInterface = ({
                   : "bg-muted text-muted-foreground mr-2"
               )}
             >
-              <p className="text-sm">{message.content}</p>
+              {message.role === "assistant" ? (
+                <div>
+                  <p className="text-sm mt-2">
+                    {extractCodeAndExplanation(message.content).explanation}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-sm">{message.content}</p>
+              )}
             </div>
           </div>
         ))}

@@ -1,15 +1,24 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VideoPreview } from "@/components/VideoPreview";
 import { ContentTabs } from "@/components/ContentTabs";
 import { Play, Code, Clock } from "lucide-react";
+import Editor from "@monaco-editor/react";
+import { useTheme } from "@/hooks/useTheme";
 
 interface MainContentProps {
   isGenerating: boolean;
   hasVideo: boolean;
+  code: string;
 }
 
-export const MainContent = ({ isGenerating, hasVideo }: MainContentProps) => {
+export const MainContent = ({
+  isGenerating,
+  hasVideo,
+  code,
+}: MainContentProps) => {
+  const { theme } = useTheme();
+  const monacoTheme = theme === "dark" ? "vs-dark" : "vs-light";
+
   return (
     <div className="flex-1 flex flex-col">
       <Tabs defaultValue="preview" className="flex-1 flex flex-col">
@@ -34,10 +43,7 @@ export const MainContent = ({ isGenerating, hasVideo }: MainContentProps) => {
           <TabsContent value="preview" className="h-full m-0 p-0">
             <div className="h-full flex flex-col">
               <div className="flex-1">
-                <VideoPreview 
-                  isGenerating={isGenerating}
-                  hasVideo={hasVideo}
-                />
+                <VideoPreview isGenerating={isGenerating} hasVideo={hasVideo} />
               </div>
               <div className="flex-shrink-0">
                 <ContentTabs hasContent={hasVideo} />
@@ -46,43 +52,29 @@ export const MainContent = ({ isGenerating, hasVideo }: MainContentProps) => {
           </TabsContent>
 
           <TabsContent value="code" className="h-full m-0 p-4">
-            <div className="h-full bg-muted/50 rounded-lg p-4 font-mono text-sm">
-              <div className="text-muted-foreground mb-4"># Generated Animation Code</div>
-              {hasVideo ? (
-                <pre className="text-foreground whitespace-pre-wrap">
-{`// Newton's Third Law Animation
-const ball = createBall({
-  position: { x: 100, y: 300 },
-  velocity: { x: 5, y: 0 },
-  mass: 1
-});
-
-const wall = createWall({
-  position: { x: 500, y: 200 },
-  width: 20,
-  height: 200
-});
-
-function animate() {
-  // Move ball
-  ball.position.x += ball.velocity.x;
-  ball.position.y += ball.velocity.y;
-  
-  // Check collision with wall
-  if (collision(ball, wall)) {
-    // Newton's 3rd Law: Equal & opposite reaction
-    ball.velocity.x *= -0.8;
-    showForceVectors(ball, wall);
-  }
-  
-  requestAnimationFrame(animate);
-}`}
-                </pre>
-              ) : (
-                <div className="text-muted-foreground italic">
-                  Generate a video to see the animation code
-                </div>
-              )}
+            <div className="h-full flex flex-col bg-muted/50 rounded-lg font-mono text-sm">
+              <div className="flex-1 min-h-0 rounded-lg overflow-hidden">
+                {code ? (
+                  <Editor
+                    height="100%"
+                    width="100%"
+                    defaultLanguage="python"
+                    value={code}
+                    theme={monacoTheme}
+                    options={{
+                      readOnly: true,
+                      minimap: { enabled: false },
+                      fontSize: 14,
+                      scrollBeyondLastLine: true,
+                      wordWrap: "on",
+                    }}
+                  />
+                ) : (
+                  <div className="text-muted-foreground italic">
+                    No code generated yet. Send a message to generate code.
+                  </div>
+                )}
+              </div>
             </div>
           </TabsContent>
 
@@ -95,32 +87,48 @@ function animate() {
                     <div className="w-2 h-2 bg-primary rounded-full"></div>
                     <div className="flex-1">
                       <div className="font-medium">Introduction</div>
-                      <div className="text-sm text-muted-foreground">0:00 - 0:05</div>
-                      <div className="text-sm">Title and overview of Newton's Third Law</div>
+                      <div className="text-sm text-muted-foreground">
+                        0:00 - 0:05
+                      </div>
+                      <div className="text-sm">
+                        Title and overview of Newton's Third Law
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
                     <div className="w-2 h-2 bg-primary rounded-full"></div>
                     <div className="flex-1">
                       <div className="font-medium">Ball Animation</div>
-                      <div className="text-sm text-muted-foreground">0:05 - 0:15</div>
-                      <div className="text-sm">Ball moving towards wall with velocity indicators</div>
+                      <div className="text-sm text-muted-foreground">
+                        0:05 - 0:15
+                      </div>
+                      <div className="text-sm">
+                        Ball moving towards wall with velocity indicators
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
                     <div className="w-2 h-2 bg-primary rounded-full"></div>
                     <div className="flex-1">
                       <div className="font-medium">Collision & Forces</div>
-                      <div className="text-sm text-muted-foreground">0:15 - 0:25</div>
-                      <div className="text-sm">Impact showing equal and opposite forces</div>
+                      <div className="text-sm text-muted-foreground">
+                        0:15 - 0:25
+                      </div>
+                      <div className="text-sm">
+                        Impact showing equal and opposite forces
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
                     <div className="w-2 h-2 bg-primary rounded-full"></div>
                     <div className="flex-1">
                       <div className="font-medium">Summary</div>
-                      <div className="text-sm text-muted-foreground">0:25 - 0:30</div>
-                      <div className="text-sm">Key takeaways and law explanation</div>
+                      <div className="text-sm text-muted-foreground">
+                        0:25 - 0:30
+                      </div>
+                      <div className="text-sm">
+                        Key takeaways and law explanation
+                      </div>
                     </div>
                   </div>
                 </div>

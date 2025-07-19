@@ -5,7 +5,7 @@ from app.core.database import get_db
 
 from app.schemas.message import MessageCreate, Message
 from app.crud.message import get_message, create_message, get_messages_by_chat_id, delete_message
-from app.crud.chat import get_chat, update_prompt_session_history
+from app.crud.chat import get_chat
 
 from app.models.user import User
 from app.api.dependencies import get_current_user
@@ -24,11 +24,14 @@ def create_message_endpoint(message: MessageCreate,
         if not chat:
             raise HTTPException(status_code=404, detail="Chat not found")
 
-        prompt_session = PromptSession.from_json(chat.prompt_session_history)
+        # Reconstruct prompt session from chat messages
+        chat_messages = chat.messages
+        prompt_session = PromptSession([
+            {"role": m.role, "content": m.content} for m in chat_messages
+        ])
 
         try:
             generated_code = generate_manim_code(message.content, prompt_session)
-            print(f"Generated Manim code: {generated_code}")
 
             ai_message = MessageCreate(
                 content=generated_code,
@@ -36,21 +39,11 @@ def create_message_endpoint(message: MessageCreate,
                 chat_id=message.chat_id
             )
             ai_response = create_message(db=db, message=ai_message)
-
-            update_prompt_session_history(
-                db=db,
-                chat_id=message.chat_id,
-                session_history_json=prompt_session.to_json()
-            )
-
-            return new_message
+            return ai_response
 
         except Exception as e:
-            # If generation fails, still return the user message but log the error
             print(f"Error generating Manim code: {e}")
             return new_message
-
-    return new_message
 
 @router.get("/chat/{chat_id}", response_model=list[Message])
 def get_messages_by_chat_endpoint(chat_id: int,

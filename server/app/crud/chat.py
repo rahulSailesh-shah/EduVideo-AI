@@ -47,15 +47,4 @@ def delete_chat(db: Session, chat_id: int) -> Optional[Chat]:
     return db_chat
 
 
-def update_prompt_session_history(db: Session, chat_id: int, session_history_json: str) -> Optional[Chat]:
-    """Update the prompt session history for a specific chat"""
-    db_chat = db.query(Chat).filter(Chat.id == chat_id).first()
-    if not db_chat:
-        return None
-
-    db_chat.prompt_session_history = session_history_json
-    db_chat.updated_at = datetime.utcnow()
-
-    db.commit()
-    db.refresh(db_chat)
-    return db_chat
+    # update_prompt_session_history removed; chat history is managed via messages

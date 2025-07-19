@@ -12,6 +12,8 @@ const Project = () => {
   const [hasVideo, setHasVideo] = useState(projectId === "1"); // Mock some projects having videos
   const { toast } = useToast();
 
+  const [code, setCode] = useState("");
+
   const handleMessageSent = async (message: string) => {
     setIsGenerating(true);
     setHasVideo(false);
@@ -55,11 +57,16 @@ const Project = () => {
           <ChatInterface
             onMessageSent={handleMessageSent}
             isGenerating={isGenerating}
+            setCode={setCode}
           />
         </div>
 
         {/* Main Content Area */}
-        <MainContent isGenerating={isGenerating} hasVideo={hasVideo} />
+        <MainContent
+          isGenerating={isGenerating}
+          hasVideo={hasVideo}
+          code={code}
+        />
       </div>
     </div>
   );
