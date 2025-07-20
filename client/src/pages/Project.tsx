@@ -13,6 +13,7 @@ const Project = () => {
   const { toast } = useToast();
 
   const [code, setCode] = useState("");
+  const [videoURL, setVideoURL] = useState("");
 
   const handleMessageSent = async (message: string) => {
     setIsGenerating(true);
@@ -54,19 +55,11 @@ const Project = () => {
       <div className="flex flex-1">
         {/* Chat Interface */}
         <div className="w-1/3 border-r border-border">
-          <ChatInterface
-            onMessageSent={handleMessageSent}
-            isGenerating={isGenerating}
-            setCode={setCode}
-          />
+          <ChatInterface setCode={setCode} setVideoURL={setVideoURL} />
         </div>
 
         {/* Main Content Area */}
-        <MainContent
-          isGenerating={isGenerating}
-          hasVideo={hasVideo}
-          code={code}
-        />
+        <MainContent code={code} videoURL={videoURL} />
       </div>
     </div>
   );

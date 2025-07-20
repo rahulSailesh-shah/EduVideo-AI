@@ -14,32 +14,35 @@ interface Message {
 }
 
 interface ChatInterfaceProps {
-  onMessageSent: (message: string) => void;
-  isGenerating: boolean;
   setCode: (code: string) => void;
+  setVideoURL: (url: string) => void;
 }
 
 function extractCodeAndExplanation(input: string): {
   code: string;
   explanation: string;
 } {
-  console.log("Extracting code and explanation from input:", input);
-
   const codeMatch = input.match(/```python([\s\S]*?)```/);
   const textMatch = input.match(/```text([\s\S]*?)```/);
-  console.log("Code match:", codeMatch);
-  console.log("Explanation match:", textMatch);
   return {
     code: codeMatch ? codeMatch[1].trim() : "",
     explanation: textMatch ? textMatch[1].trim() : "",
   };
 }
 
-export const ChatInterface = ({
-  onMessageSent,
-  isGenerating,
-  setCode,
-}: ChatInterfaceProps) => {
+const base64ToVideoUrl = (base64Data: string): string => {
+  const byteCharacters = atob(base64Data);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  const videoBlob = new Blob([byteArray], { type: "video/mp4" });
+
+  return URL.createObjectURL(videoBlob);
+};
+
+export const ChatInterface = ({ setVideoURL, setCode }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -52,8 +55,7 @@ export const ChatInterface = ({
   }
 
   const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyYWh1bCIsImV4cCI6MTc1MjkyNTg4OH0.o6yI-5W_Xcig32eM1c5nL73Zg9_Nw_Sm9M0TRhgcqpg";
-  const user_id = "1";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyYWh1bCIsImV4cCI6MTc1MzA4NTIyOH0.TAXTK7Qo9XYXHM3XZgHz9eqh2rYlgRuO8ThRIj6jB5k";
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -130,6 +132,7 @@ export const ChatInterface = ({
           chat_id: projectId,
         }),
       });
+
       if (!res.ok) {
         toast({
           title: "Error",
@@ -137,14 +140,23 @@ export const ChatInterface = ({
         });
         return;
       }
-      const data = await res.json();
-      const { code, explanation } = extractCodeAndExplanation(data.content);
+
+      const { text, video_data } = await res.json();
+      console.log("Response from server:", text, video_data);
+      if (video_data) {
+        const videoUrl = base64ToVideoUrl(video_data);
+        setVideoURL(videoUrl);
+      }
+
+      const { code, explanation } = extractCodeAndExplanation(text.content);
       if (code) {
         setCode(code);
       }
-      setMessages((prev) => [...prev, data]);
+
+      setMessages((prev) => [...prev, text]);
       setInput("");
     } catch (error) {
+      console.error("Error sending message:", error);
       toast({
         title: "Error",
         description: "Failed to send message.",
@@ -199,32 +211,6 @@ export const ChatInterface = ({
             </div>
           </div>
         ))}
-        {isGenerating && (
-          <div className="flex gap-3 max-w-4xl">
-            <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center flex-shrink-0">
-              <Bot className="w-4 h-4" />
-            </div>
-            <div className="bg-muted text-muted-foreground rounded-lg px-4 py-2 mr-2">
-              <div className="flex items-center gap-2">
-                <div className="flex space-x-1">
-                  <div
-                    className="w-2 h-2 bg-current rounded-full animate-bounce"
-                    style={{ animationDelay: "0ms" }}
-                  ></div>
-                  <div
-                    className="w-2 h-2 bg-current rounded-full animate-bounce"
-                    style={{ animationDelay: "150ms" }}
-                  ></div>
-                  <div
-                    className="w-2 h-2 bg-current rounded-full animate-bounce"
-                    style={{ animationDelay: "300ms" }}
-                  ></div>
-                </div>
-                <span className="text-sm">Generating...</span>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Input */}
@@ -242,11 +228,7 @@ export const ChatInterface = ({
               }
             }}
           />
-          <Button
-            type="submit"
-            disabled={!input.trim() || isGenerating}
-            className="self-end"
-          >
+          <Button type="submit" disabled={!input.trim()} className="self-end">
             <Send className="w-4 h-4" />
           </Button>
         </div>

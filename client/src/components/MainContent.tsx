@@ -6,16 +6,11 @@ import Editor from "@monaco-editor/react";
 import { useTheme } from "@/hooks/useTheme";
 
 interface MainContentProps {
-  isGenerating: boolean;
-  hasVideo: boolean;
   code: string;
+  videoURL: string;
 }
 
-export const MainContent = ({
-  isGenerating,
-  hasVideo,
-  code,
-}: MainContentProps) => {
+export const MainContent = ({ code, videoURL }: MainContentProps) => {
   const { theme } = useTheme();
   const monacoTheme = theme === "dark" ? "vs-dark" : "vs-light";
 
@@ -43,11 +38,11 @@ export const MainContent = ({
           <TabsContent value="preview" className="h-full m-0 p-0">
             <div className="h-full flex flex-col">
               <div className="flex-1">
-                <VideoPreview isGenerating={isGenerating} hasVideo={hasVideo} />
+                <VideoPreview videoURL={videoURL} />
               </div>
-              <div className="flex-shrink-0">
+              {/* <div className="flex-shrink-0">
                 <ContentTabs hasContent={hasVideo} />
-              </div>
+              </div> */}
             </div>
           </TabsContent>
 
@@ -81,62 +76,9 @@ export const MainContent = ({
           <TabsContent value="timeline" className="h-full m-0 p-4">
             <div className="h-full">
               <h3 className="text-lg font-semibold mb-4">Animation Timeline</h3>
-              {hasVideo ? (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
-                    <div className="w-2 h-2 bg-primary rounded-full"></div>
-                    <div className="flex-1">
-                      <div className="font-medium">Introduction</div>
-                      <div className="text-sm text-muted-foreground">
-                        0:00 - 0:05
-                      </div>
-                      <div className="text-sm">
-                        Title and overview of Newton's Third Law
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
-                    <div className="w-2 h-2 bg-primary rounded-full"></div>
-                    <div className="flex-1">
-                      <div className="font-medium">Ball Animation</div>
-                      <div className="text-sm text-muted-foreground">
-                        0:05 - 0:15
-                      </div>
-                      <div className="text-sm">
-                        Ball moving towards wall with velocity indicators
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
-                    <div className="w-2 h-2 bg-primary rounded-full"></div>
-                    <div className="flex-1">
-                      <div className="font-medium">Collision & Forces</div>
-                      <div className="text-sm text-muted-foreground">
-                        0:15 - 0:25
-                      </div>
-                      <div className="text-sm">
-                        Impact showing equal and opposite forces
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
-                    <div className="w-2 h-2 bg-primary rounded-full"></div>
-                    <div className="flex-1">
-                      <div className="font-medium">Summary</div>
-                      <div className="text-sm text-muted-foreground">
-                        0:25 - 0:30
-                      </div>
-                      <div className="text-sm">
-                        Key takeaways and law explanation
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-muted-foreground italic">
-                  Generate a video to see the timeline breakdown
-                </div>
-              )}
+              <div className="text-muted-foreground italic">
+                Generate a video to see the timeline breakdown
+              </div>
             </div>
           </TabsContent>
         </div>
