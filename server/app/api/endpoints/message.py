@@ -56,14 +56,33 @@ def create_message_endpoint(message: MessageCreate,
                     video_data=video_data,
                 )
             except ManimGenerationError as e:
-                raise HTTPException(
-                    status_code=422,
-                    detail={
-                        "error": "Video generation failed",
-                        "detail": str(e),
-                        "error_code": "MANIM_GENERATION_ERROR"
-                    }
-                )
+                # Reprompt LLM with error included
+                print(f"Error generating video: {e}")
+                print(f"Original message content: {message.content}")
+                error_message = f"Video generation failed: {str(e)}. Please fix the code and try again."
+                reprompt_content = f"{message.content}\n\n{error_message}"
+                try:
+                    regenerated_code = llm_service.generate_manim_code(reprompt_content, prompt_session)
+                    ai_message_retry = MessageCreate(
+                        content=regenerated_code,
+                        role="assistant",
+                        chat_id=message.chat_id
+                    )
+                    ai_response_retry = create_message(db=db, message=ai_message_retry)
+                    video_data_retry, video_size_mb_retry = manim_service.generate_video(regenerated_code)
+                    return VideoResponse(
+                        text=ai_response_retry,
+                        video_data=video_data_retry,
+                    )
+                except ManimGenerationError as e2:
+                    raise HTTPException(
+                        status_code=422,
+                        detail={
+                            "error": "Video generation failed after retry",
+                            "detail": str(e2),
+                            "error_code": "MANIM_GENERATION_ERROR_RETRY"
+                        }
+                    )
         except Exception as e:
             print(f"Error generating code: {e}")
             raise HTTPException(status_code=500, detail=str(e))

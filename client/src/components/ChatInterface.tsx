@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, User, Bot } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate, useParams } from "react-router-dom";
@@ -44,6 +45,7 @@ const base64ToVideoUrl = (base64Data: string): string => {
 
 export const ChatInterface = ({ setVideoURL, setCode }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -117,7 +119,18 @@ export const ChatInterface = ({ setVideoURL, setCode }: ChatInterfaceProps) => {
       created_at: new Date().toISOString(),
     };
 
-    setMessages((prev) => [...prev, newMessage]);
+    setMessages((prev) => [
+      ...prev,
+      newMessage,
+      {
+        id: "generating-status",
+        content: "Generating response...",
+        role: "assistant",
+        created_at: new Date().toISOString(),
+      },
+    ]);
+    setIsGenerating(true);
+    setInput("");
 
     try {
       const res = await fetch(`http://localhost:8000/api/messages`, {
@@ -138,11 +151,15 @@ export const ChatInterface = ({ setVideoURL, setCode }: ChatInterfaceProps) => {
           title: "Error",
           description: "Failed to send message.",
         });
+        // Remove generating status
+        setMessages((prev) =>
+          prev.filter((msg) => msg.id !== "generating-status")
+        );
+        setIsGenerating(false);
         return;
       }
 
       const { text, video_data } = await res.json();
-      console.log("Response from server:", text, video_data);
       if (video_data) {
         const videoUrl = base64ToVideoUrl(video_data);
         setVideoURL(videoUrl);
@@ -153,14 +170,23 @@ export const ChatInterface = ({ setVideoURL, setCode }: ChatInterfaceProps) => {
         setCode(code);
       }
 
-      setMessages((prev) => [...prev, text]);
-      setInput("");
+      // Replace generating status with actual message
+      setMessages((prev) => {
+        const filtered = prev.filter((msg) => msg.id !== "generating-status");
+        return [...filtered, text];
+      });
+      setIsGenerating(false);
     } catch (error) {
       console.error("Error sending message:", error);
       toast({
         title: "Error",
         description: "Failed to send message.",
       });
+      // Remove generating status
+      setMessages((prev) =>
+        prev.filter((msg) => msg.id !== "generating-status")
+      );
+      setIsGenerating(false);
       return;
     }
   };
@@ -199,7 +225,14 @@ export const ChatInterface = ({ setVideoURL, setCode }: ChatInterfaceProps) => {
                   : "bg-muted text-muted-foreground mr-2"
               )}
             >
-              {message.role === "assistant" ? (
+              {message.id === "generating-status" ? (
+                <div className="flex items-center gap-2">
+                  <span className="animate-pulse text-sm text-muted-foreground">
+                    {message.content}
+                  </span>
+                  <Loader2 className="animate-spin h-4 w-4 text-muted-foreground" />
+                </div>
+              ) : message.role === "assistant" ? (
                 <div>
                   <p className="text-sm mt-2">
                     {extractCodeAndExplanation(message.content).explanation}
