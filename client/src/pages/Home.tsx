@@ -18,9 +18,8 @@ interface Project {
   created_at: string;
   updated_at: string;
 }
-
 const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyYWh1bCIsImV4cCI6MTc1MzA4NTIyOH0.TAXTK7Qo9XYXHM3XZgHz9eqh2rYlgRuO8ThRIj6jB5k";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyYWh1bCIsImV4cCI6MTc1NDI3OTMxOH0.eqSXLHLo0KjmAkNGIHx_75EJmb65isACfcMP004LKZ4";
 const user_id = "1";
 
 const Home = () => {

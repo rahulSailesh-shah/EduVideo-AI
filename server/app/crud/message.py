@@ -24,6 +24,18 @@ def create_message(db: Session, message: MessageCreate) -> Message:
     db.refresh(db_message)
     return db_message
 
+def update_message(db: Session, message_id: int, message: MessageCreate) -> Optional[Message]:
+    db_message = get_message(db, message_id)
+    if not db_message:
+        return None
+
+    db_message.content = message.content
+    db_message.role = message.role
+    db_message.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(db_message)
+    return db_message
+
 def delete_message(db: Session, message_id: int) -> Optional[Message]:
     db_message = get_message(db, message_id)
     if not db_message:

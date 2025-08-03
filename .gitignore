@@ -1,4 +1,5 @@
 venv
+.venv
 .env
 node_modules
 .vscode
@@ -7,3 +8,4 @@ __pycache__
 *.db
 dist
 scripts/
+audios/

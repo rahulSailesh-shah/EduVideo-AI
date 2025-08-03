@@ -15,12 +15,7 @@ export const Navbar = ({ onCreateNew, onBack, showBack }: NavbarProps) => {
     <nav className="h-14 border-b border-border bg-card px-6 flex items-center justify-between">
       <div className="flex items-center gap-4">
         {showBack && onBack && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onBack}
-            className="gap-2"
-          >
+          <Button variant="ghost" size="sm" onClick={onBack} className="gap-2">
             <ArrowLeft className="w-4 h-4" />
             Back
           </Button>
@@ -38,23 +33,16 @@ export const Navbar = ({ onCreateNew, onBack, showBack }: NavbarProps) => {
           <Plus className="w-4 h-4" />
           New Project
         </Button>
-        
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleTheme}
-        >
-          {theme === 'dark' ? (
+
+        <Button variant="ghost" size="sm" onClick={toggleTheme}>
+          {theme === "dark" ? (
             <Sun className="w-4 h-4" />
           ) : (
             <Moon className="w-4 h-4" />
           )}
         </Button>
-        
-        <Button
-          variant="ghost"
-          size="sm"
-        >
+
+        <Button variant="ghost" size="sm">
           <Settings className="w-4 h-4" />
         </Button>
       </div>

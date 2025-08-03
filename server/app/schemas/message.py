@@ -8,12 +8,15 @@ class MessageBase(BaseModel):
   content: str
   role: str
 
+
 class MessageCreate(MessageBase):
   chat_id: int
+  video_url: Optional[str] = None
 
 class MessageUpdate(MessageBase):
   content: Optional[str] = None
   role: Optional[str] = None
+  video_url: Optional[str] = None
 
 class Message(MessageBase):
   id: int

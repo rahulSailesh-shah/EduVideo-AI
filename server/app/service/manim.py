@@ -133,7 +133,7 @@ class ManimService:
         except Exception as e:
             print(f"Warning: Failed to delete media directory {media_dir}: {e}")
 
-    def generate_video(self, llm_code_response: str, timeout: int = 300) -> Tuple[str, float]:
+    def generate_video(self, llm_code_response: str, timeout: int = 300) -> Tuple[str, bytes, float]:
         try:
             # Extract and validate code
             code = self.extract_code_from_response(llm_code_response)
@@ -150,8 +150,9 @@ class ManimService:
                             f"Generated video is too large: {size_mb:.2f}MB > {10.0}MB"
                         )
                     with open(video_path, 'rb') as video_file:
-                        video_data = base64.b64encode(video_file.read()).decode('utf-8')
-                    return video_data, size_mb
+                        video_bytes = video_file.read()
+                        video_b64 = base64.b64encode(video_bytes).decode('utf-8')
+                    return video_b64, video_bytes, size_mb
                 finally:
                     self.cleanup_media_files(script_filename)
 

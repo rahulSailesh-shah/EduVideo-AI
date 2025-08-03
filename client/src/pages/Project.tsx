@@ -5,35 +5,21 @@ import { MainContent } from "@/components/MainContent";
 import { Navbar } from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
 
+export interface VideoData {
+  id: number;
+  created_at: Date;
+  updated_at: Date;
+  video_url: string | null;
+  chat_id: number;
+  message_id: number;
+}
+
 const Project = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [hasVideo, setHasVideo] = useState(projectId === "1"); // Mock some projects having videos
-  const { toast } = useToast();
 
   const [code, setCode] = useState("");
-  const [videoURL, setVideoURL] = useState("");
-
-  const handleMessageSent = async (message: string) => {
-    setIsGenerating(true);
-    setHasVideo(false);
-
-    toast({
-      title: "Generation Started",
-      description: "Your educational video is being created...",
-    });
-
-    // Simulate video generation
-    setTimeout(() => {
-      setIsGenerating(false);
-      setHasVideo(true);
-      toast({
-        title: "Video Generated!",
-        description: "Your educational video is ready to preview.",
-      });
-    }, 3000);
-  };
+  const [videoData, setVideoData] = useState<VideoData[]>([]);
 
   const handleCreateNew = () => {
     const newProjectId = Date.now().toString();
@@ -55,11 +41,11 @@ const Project = () => {
       <div className="flex flex-1">
         {/* Chat Interface */}
         <div className="w-1/3 border-r border-border">
-          <ChatInterface setCode={setCode} setVideoURL={setVideoURL} />
+          <ChatInterface setCode={setCode} setVideoData={setVideoData} />
         </div>
 
         {/* Main Content Area */}
-        <MainContent code={code} videoURL={videoURL} />
+        <MainContent code={code} videoData={videoData} />
       </div>
     </div>
   );

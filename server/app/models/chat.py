@@ -13,7 +13,6 @@ class Chat(Base):
     created_at = Column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
 
-    # prompt_session_history field removed; use messages relationship for chat history
-
     user = relationship("User", back_populates="chats")
     messages = relationship("Message", back_populates="chat", cascade="all, delete-orphan")
+    videos = relationship("Video", back_populates="chat", cascade="all, delete-orphan")

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, User, Bot } from "lucide-react";
@@ -6,17 +6,19 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate, useParams } from "react-router-dom";
+import { VideoData } from "@/pages/Project";
 
 interface Message {
   id: string;
   content: string;
   role: "user" | "assistant";
   created_at: string;
+  video_url?: string;
 }
 
 interface ChatInterfaceProps {
   setCode: (code: string) => void;
-  setVideoURL: (url: string) => void;
+  setVideoData: React.Dispatch<React.SetStateAction<VideoData[]>>;
 }
 
 function extractCodeAndExplanation(input: string): {
@@ -31,21 +33,11 @@ function extractCodeAndExplanation(input: string): {
   };
 }
 
-const base64ToVideoUrl = (base64Data: string): string => {
-  const byteCharacters = atob(base64Data);
-  const byteNumbers = new Array(byteCharacters.length);
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-  }
-  const byteArray = new Uint8Array(byteNumbers);
-  const videoBlob = new Blob([byteArray], { type: "video/mp4" });
-
-  return URL.createObjectURL(videoBlob);
-};
-
-export const ChatInterface = ({ setVideoURL, setCode }: ChatInterfaceProps) => {
+export const ChatInterface = ({
+  setCode,
+  setVideoData,
+}: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -57,56 +49,81 @@ export const ChatInterface = ({ setVideoURL, setCode }: ChatInterfaceProps) => {
   }
 
   const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyYWh1bCIsImV4cCI6MTc1MzA4NTIyOH0.TAXTK7Qo9XYXHM3XZgHz9eqh2rYlgRuO8ThRIj6jB5k";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyYWh1bCIsImV4cCI6MTc1NDI3OTMxOH0.eqSXLHLo0KjmAkNGIHx_75EJmb65isACfcMP004LKZ4";
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      setIsLoading(true);
-      try {
-        const res = await fetch(
-          `http://localhost:8000/api/messages/chat/${projectId}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        if (!res.ok) {
-          toast({
-            title: "Error",
-            description: "Failed to load messages.",
-          });
-          navigate("/");
-          return;
+  const fetchMessages = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `http://localhost:8000/api/messages/chat/${projectId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-        const data = await res.json();
-
-        const lastAssistantMessage = [...data]
-          .reverse()
-          .find((msg: Message) => msg.role === "assistant");
-        if (lastAssistantMessage) {
-          const { code, explanation } = extractCodeAndExplanation(
-            lastAssistantMessage.content
-          );
-          if (code) {
-            setCode(code);
-          }
-        }
-
-        setMessages(data);
-      } catch (error) {
+      );
+      if (!res.ok) {
         toast({
           title: "Error",
           description: "Failed to load messages.",
         });
         navigate("/");
-      } finally {
-        setIsLoading(false);
+        return;
       }
-    };
+      const data = await res.json();
+      const lastAssistantMessage = [...data]
+        .reverse()
+        .find((msg: Message) => msg.role === "assistant");
+      if (lastAssistantMessage) {
+        const { code, explanation } = extractCodeAndExplanation(
+          lastAssistantMessage.content
+        );
+        if (code) {
+          setCode(code);
+        }
+      }
+      setMessages(data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load messages.",
+      });
+      navigate("/");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [navigate, projectId, setCode, toast, token]);
+
+  const fetchVideos = useCallback(async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:8000/api/videos/chat/${projectId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!res.ok) {
+        throw new Error("Failed to fetch videos");
+      }
+      const data = await res.json();
+      setVideoData(data);
+    } catch (error) {
+      console.error("Error fetching videos:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load videos.",
+      });
+    }
+  }, [projectId, toast, token, setVideoData]);
+
+  useEffect(() => {
     fetchMessages();
-  }, [navigate, projectId, setCode, toast]);
+    fetchVideos();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,7 +146,6 @@ export const ChatInterface = ({ setVideoURL, setCode }: ChatInterfaceProps) => {
         created_at: new Date().toISOString(),
       },
     ]);
-    setIsGenerating(true);
     setInput("");
 
     try {
@@ -155,14 +171,13 @@ export const ChatInterface = ({ setVideoURL, setCode }: ChatInterfaceProps) => {
         setMessages((prev) =>
           prev.filter((msg) => msg.id !== "generating-status")
         );
-        setIsGenerating(false);
         return;
       }
 
-      const { text, video_data } = await res.json();
-      if (video_data) {
-        const videoUrl = base64ToVideoUrl(video_data);
-        setVideoURL(videoUrl);
+      const { text, video_response } = await res.json();
+
+      if (video_response && video_response.video_url) {
+        setVideoData((prev) => [video_response, ...prev]);
       }
 
       const { code, explanation } = extractCodeAndExplanation(text.content);
@@ -175,7 +190,6 @@ export const ChatInterface = ({ setVideoURL, setCode }: ChatInterfaceProps) => {
         const filtered = prev.filter((msg) => msg.id !== "generating-status");
         return [...filtered, text];
       });
-      setIsGenerating(false);
     } catch (error) {
       console.error("Error sending message:", error);
       toast({
@@ -186,7 +200,6 @@ export const ChatInterface = ({ setVideoURL, setCode }: ChatInterfaceProps) => {
       setMessages((prev) =>
         prev.filter((msg) => msg.id !== "generating-status")
       );
-      setIsGenerating(false);
       return;
     }
   };
