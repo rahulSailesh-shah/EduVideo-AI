@@ -18,6 +18,11 @@ class Settings(BaseSettings):
     # Optional settings with defaults
     llm_base_url: str = "https://generativelanguage.googleapis.com/v1beta/openai/"
 
+    # Google OAuth settings
+    google_client_id: Optional[str] = None
+    google_client_secret: Optional[str] = None
+    google_redirect_uri: str = "http://localhost:8080/auth/callback"
+
     # Path and config settings with defaults
     scripts_dir: Path = Path("./scripts")  # More portable default
     manim_quality: str = "720p30"

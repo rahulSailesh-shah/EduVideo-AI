@@ -8,7 +8,11 @@ class User(Base):
 
   id = Column(Integer, primary_key=True, index=True)
   username = Column(String, unique=True, index=True, nullable=False)
-  hashed_password = Column(String, nullable=False)
+  email = Column(String, unique=True, index=True, nullable=True)
+  hashed_password = Column(String, nullable=True)  # Made nullable for OAuth users
+  oauth_provider = Column(String, nullable=True)  # 'google', 'github', etc.
+  oauth_id = Column(String, nullable=True)  # OAuth provider's user ID
+  refresh_token = Column(String, nullable=True)  # OAuth refresh token
   created_at = Column(DateTime(timezone=True), nullable=False)
   updated_at = Column(DateTime(timezone=True), nullable=False)
 

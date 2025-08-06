@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { VideoData } from "@/pages/Project";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface VoiceOverModalProps {
   show: boolean;
@@ -11,6 +12,7 @@ interface VoiceOverModalProps {
   audioFile: File | null;
   setAudioFile: (file: File | null) => void;
   selectedVideo: VideoData | null;
+  onVideoGenerated?: () => void; // Add callback to refresh videos
 }
 
 export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
@@ -21,10 +23,13 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
   audioFile,
   setAudioFile,
   selectedVideo,
+  onVideoGenerated,
 }) => {
   const [loading, setLoading] = useState(false);
   const [loadingVoiceOver, setLoadingVoiceOver] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
+  const { toast } = useToast();
+  const { token, isAuthenticated } = useAuth();
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -40,10 +45,10 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
       setLoadingStep(0);
     }
   }, [loadingVoiceOver]);
-  const { toast } = useToast();
 
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyYWh1bCIsImV4cCI6MTc1NDI3OTMxOH0.eqSXLHLo0KjmAkNGIHx_75EJmb65isACfcMP004LKZ4";
+  if (!isAuthenticated || !token) {
+    return null;
+  }
 
   function extractTripleQuotedContent(input: string): string {
     const match = input.match(/```(?:[\w+-]*)?\n([\s\S]*?)```/);
@@ -105,6 +110,7 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
       }
 
       const data = await res.json();
+      console.log(data);
       if (data.success) {
         toast({
           title: "Success",

@@ -15,6 +15,8 @@ class UserUpdate(UserBase):
 
 class User(UserBase):
     id: int
+    email: Optional[str] = None
+    oauth_provider: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
@@ -30,3 +32,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Optional[str] = None
+
+class GoogleAuthRequest(BaseModel):
+    code: str
+    redirect_uri: str

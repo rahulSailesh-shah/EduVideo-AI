@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { VideoData } from "@/pages/Project";
 
 interface Message {
@@ -43,15 +44,24 @@ export const ChatInterface = ({
   const { toast } = useToast();
   const { projectId } = useParams();
   const navigate = useNavigate();
+  const { token, isAuthenticated, loading } = useAuth();
 
-  if (!projectId) {
-    navigate("/");
-  }
+  // Move navigation logic to useEffect to avoid hook ordering issues
+  useEffect(() => {
+    if (!projectId) {
+      navigate("/");
+      return;
+    }
 
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyYWh1bCIsImV4cCI6MTc1NDI3OTMxOH0.eqSXLHLo0KjmAkNGIHx_75EJmb65isACfcMP004LKZ4";
+    if (!loading && (!isAuthenticated || !token)) {
+      navigate("/");
+      return;
+    }
+  }, [projectId, isAuthenticated, token, navigate, loading]);
 
   const fetchMessages = useCallback(async () => {
+    if (!token) return;
+
     setIsLoading(true);
     try {
       const res = await fetch(
@@ -96,6 +106,8 @@ export const ChatInterface = ({
   }, [navigate, projectId, setCode, toast, token]);
 
   const fetchVideos = useCallback(async () => {
+    if (!token) return;
+
     try {
       const res = await fetch(
         `http://localhost:8000/api/videos/chat/${projectId}`,
@@ -121,9 +133,11 @@ export const ChatInterface = ({
   }, [projectId, toast, token, setVideoData]);
 
   useEffect(() => {
-    fetchMessages();
-    fetchVideos();
-  }, []);
+    if (!loading && token) {
+      fetchMessages();
+      fetchVideos();
+    }
+  }, [fetchMessages, fetchVideos, loading, token]); // Add all dependencies
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -203,6 +217,11 @@ export const ChatInterface = ({
       return;
     }
   };
+
+  // Early return if not authenticated or no projectId - after all hooks
+  if (!projectId || (!loading && (!isAuthenticated || !token))) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col h-full">
