@@ -231,54 +231,79 @@ export const ChatInterface = ({
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-background">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth">
+        {messages.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-full text-center py-12">
+            <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-accent/30 rounded-2xl flex items-center justify-center mb-4">
+              <Bot className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="text-xl font-semibold text-foreground mb-2">
+              Let's Create Something Amazing!
+            </h3>
+            <p className="text-muted-foreground max-w-md">
+              Describe the educational video you'd like to create and I'll help
+              you bring it to life with AI.
+            </p>
+          </div>
+        )}
+
         {messages.map((message) => (
           <div
             key={message.id}
             className={cn(
-              "flex gap-3 max-w-4xl",
+              "flex gap-4 max-w-4xl animate-in slide-in-from-bottom-2 duration-300",
               message.role === "user" ? "ml-auto flex-row-reverse" : ""
             )}
           >
             <div
               className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
+                "w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md",
                 message.role === "user"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
+                  ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground"
+                  : "bg-gradient-to-br from-muted to-muted/80 text-muted-foreground border border-border"
               )}
             >
               {message.role === "user" ? (
-                <User className="w-4 h-4" />
+                <User className="w-5 h-5" />
               ) : (
-                <Bot className="w-4 h-4" />
+                <Bot className="w-5 h-5" />
               )}
             </div>
             <div
               className={cn(
-                "rounded-lg px-4 py-2 max-w-[80%]",
+                "rounded-2xl px-5 py-4 max-w-[80%] shadow-sm backdrop-blur-sm",
                 message.role === "user"
-                  ? "bg-primary text-primary-foreground ml-2"
-                  : "bg-muted text-muted-foreground mr-2"
+                  ? "bg-primary/90 text-primary-foreground ml-3"
+                  : "bg-card/80 border border-border text-card-foreground mr-3"
               )}
             >
               {message.id === "generating-status" ? (
-                <div className="flex items-center gap-2">
-                  <span className="animate-pulse text-sm text-muted-foreground">
+                <div className="flex items-center gap-3">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                    <div
+                      className="w-2 h-2 bg-primary rounded-full animate-bounce"
+                      style={{ animationDelay: "0.1s" }}
+                    ></div>
+                    <div
+                      className="w-2 h-2 bg-primary rounded-full animate-bounce"
+                      style={{ animationDelay: "0.2s" }}
+                    ></div>
+                  </div>
+                  <span className="text-sm text-muted-foreground font-medium">
                     {message.content}
                   </span>
-                  <Loader2 className="animate-spin h-4 w-4 text-muted-foreground" />
                 </div>
               ) : message.role === "assistant" ? (
-                <div>
-                  <p className="text-sm mt-2">
+                <div className="prose prose-sm max-w-none">
+                  <p className="text-sm leading-relaxed m-0">
                     {extractCodeAndExplanation(message.content).explanation}
                   </p>
                 </div>
               ) : (
-                <p className="text-sm">{message.content}</p>
+                <p className="text-sm leading-relaxed">{message.content}</p>
               )}
             </div>
           </div>
@@ -286,28 +311,34 @@ export const ChatInterface = ({
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="p-4 border-t border-border">
-        <div className="flex gap-2">
-          <Textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Describe the educational video you'd like to create..."
-            className="min-h-[60px] max-h-[120px] resize-none"
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e);
-              }
-            }}
-          />
-          <Button type="submit" disabled={!input.trim()} className="self-end">
-            <Send className="w-4 h-4" />
-          </Button>
-        </div>
-        <p className="text-xs text-muted-foreground mt-2">
-          Press Enter to send, Shift + Enter for new line
-        </p>
-      </form>
+      <div className="border-t border-border/50 bg-card/50 backdrop-blur-sm">
+        <form onSubmit={handleSubmit} className="p-6">
+          <div className="flex gap-4 items-end">
+            <Textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Describe the educational video you'd like to create..."
+              className="min-h-[60px] max-h-[120px] resize-none rounded-xl border-2 border-border/50 bg-background/80 backdrop-blur-sm px-4 py-3 text-sm leading-relaxed focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit(e);
+                }
+              }}
+            />
+            <Button
+              type="submit"
+              disabled={!input.trim()}
+              className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 border-0 flex-shrink-0"
+            >
+              <Send className="w-4 h-4" />
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-3 flex items-center gap-4">
+            <span>Press Enter to send, Shift + Enter for new line</span>
+          </p>
+        </form>
+      </div>
     </div>
   );
 };

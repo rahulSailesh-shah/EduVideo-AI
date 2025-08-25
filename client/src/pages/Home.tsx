@@ -1,15 +1,9 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Plus, Video, Calendar, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
+import { HeroSection } from "@/components/HeroSection";
+import { ProjectsSection } from "@/components/ProjectsSection";
+import { LoginModal } from "@/components/LoginModal";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -25,6 +19,7 @@ const Home = () => {
   const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const { toast } = useToast();
   const { token, isAuthenticated, user } = useAuth();
 
@@ -108,6 +103,88 @@ const Home = () => {
     navigate(`/project/${projectId}`);
   };
 
+  const handleEditProject = async (projectId: number, newTitle: string) => {
+    if (!token) return;
+
+    try {
+      const res = await fetch(`http://localhost:8000/api/chats/${projectId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: newTitle,
+        }),
+      });
+
+      if (!res.ok) {
+        toast({
+          title: "Error",
+          description: "Failed to update project name.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Update the local state
+      setProjects((prevProjects) =>
+        prevProjects.map((project) =>
+          project.id === projectId ? { ...project, title: newTitle } : project
+        )
+      );
+
+      toast({
+        title: "Success",
+        description: "Project name updated successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update project name.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteProject = async (projectId: number) => {
+    if (!token) return;
+
+    try {
+      const res = await fetch(`http://localhost:8000/api/chats/${projectId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        toast({
+          title: "Error",
+          description: "Failed to delete project.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Update the local state
+      setProjects((prevProjects) =>
+        prevProjects.filter((project) => project.id !== projectId)
+      );
+
+      toast({
+        title: "Success",
+        description: "Project deleted successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete project.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString("en-US", {
       month: "short",
@@ -131,61 +208,25 @@ const Home = () => {
     <div className="min-h-screen bg-background">
       <Navbar onCreateNew={handleCreateNew} showBack={false} />
 
-      <div className="container mx-auto px-6 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">
-            Educational Videos
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Create engaging educational content with AI
-          </p>
+      {isAuthenticated ? (
+        <div className="container mx-auto px-6 py-8">
+          <ProjectsSection
+            projects={projects}
+            onCreateNew={handleCreateNew}
+            onProjectClick={handleProjectClick}
+            formatDate={formatDate}
+            onEditProject={handleEditProject}
+            onDeleteProject={handleDeleteProject}
+          />
         </div>
+      ) : (
+        <HeroSection onLoginClick={() => setShowLoginModal(true)} />
+      )}
 
-        {isAuthenticated ? (
-          <>
-            <div className="mb-6">
-              <Button
-                onClick={handleCreateNew}
-                className="bg-gradient-primary hover:opacity-90 text-white px-6 py-3 h-auto text-base"
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                Create New Project
-              </Button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {projects.map((project) => (
-                <Card
-                  key={project.id}
-                  className="cursor-pointer hover-scale transition-all duration-200 hover:shadow-lg"
-                  onClick={() => handleProjectClick(project.id)}
-                >
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <Video className="w-8 h-8 text-primary mb-2" />
-                      <span className="text-xs text-muted-foreground">
-                        {formatDate(project.created_at)}
-                      </span>
-                    </div>
-                    <CardTitle className="text-lg leading-tight">
-                      {project.title}
-                    </CardTitle>
-                  </CardHeader>
-                </Card>
-              ))}
-            </div>
-          </>
-        ) : (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-semibold mb-4">
-              Welcome to EduVideo AI
-            </h2>
-            <p className="text-muted-foreground mb-6">
-              Please login to start creating educational videos
-            </p>
-          </div>
-        )}
-      </div>
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+      />
     </div>
   );
 };

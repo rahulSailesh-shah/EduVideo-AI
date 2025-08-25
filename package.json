@@ -1,5 +1,5 @@
 {
-  "name": "video",
+  "name": "vistruct",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -12,10 +12,16 @@
   "devDependencies": {
     "concurrently": "^7.6.0"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "ai",
+    "education",
+    "video",
+    "visual-instruction",
+    "learning"
+  ],
+  "author": "Vistruct Team",
   "license": "ISC",
-  "description": "",
+  "description": "AI-powered visual instruction platform for creating educational videos",
   "dependencies": {
     "@monaco-editor/react": "^4.7.0"
   }

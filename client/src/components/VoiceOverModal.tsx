@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { VideoData } from "@/pages/Project";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { X, Mic, Sparkles, Bot, Loader2, Volume2, Video } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface VoiceOverModalProps {
   show: boolean;
@@ -31,7 +36,7 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
     let timer: NodeJS.Timeout;
     if (loadingVoiceOver) {
       setLoadingStep(0);
-      timer = setTimeout(() => setLoadingStep(1), 1000);
+      timer = setTimeout(() => setLoadingStep(1), 2000);
       const timer2 = setTimeout(() => setLoadingStep(2), 2000);
       return () => {
         clearTimeout(timer);
@@ -132,70 +137,148 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
   };
 
   if (!show) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-2xl relative">
-        <button
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-          onClick={onClose}
-          aria-label="Close"
-        >
-          &times;
-        </button>
-        <h2 className="text-xl font-bold mb-4">Add Voice Over</h2>
-        <div className="flex flex-col items-start mb-2 gap-2">
-          {loading ? (
-            <textarea
-              className="flex-1 p-4 mb-0 border border-gray-300 dark:border-gray-700 rounded-lg text-base bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 w-full min-h-52"
-              placeholder="Enter voice over text here..."
-              value={"Generating script..."}
-              disabled={true}
-            />
-          ) : (
-            <textarea
-              className="flex-1 p-4 mb-0 border border-gray-300 dark:border-gray-700 rounded-lg text-base bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 w-full min-h-52"
-              placeholder="Enter voice over text here..."
-              value={voiceOverText}
-              onChange={(e) => setVoiceOverText(e.target.value)}
-            />
-          )}
-          <div className="flex flex-col justify-start items-start w-full mb-4">
-            <Button
-              variant="outline"
-              size="sm"
-              className="border border-gray-300 dark:border-gray-700 text-xs px-3 py-1 whitespace-nowrap"
-              onClick={handleGenerateUsingAI}
-              disabled={loading || !selectedVideo}
-            >
-              Generate using AI
-            </Button>
-          </div>
-        </div>
-        <div className="mb-6" />
 
-        {loadingVoiceOver ? (
-          <div className="flex flex-col items-center justify-center w-full mb-4">
-            <div className="text-base font-medium animate-pulse">
-              {loadingStep === 0 && "Converting text to speech"}
-              {loadingStep === 1 && "Merging the audio and video"}
-              {loadingStep === 2 && "Finalising your video"}
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <Card className="w-full max-w-2xl mx-4 bg-card/95 backdrop-blur-xl border-border/50 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-300">
+        {/* Modern Header */}
+        <div className="flex items-center justify-between p-6 border-b border-border/50">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-accent/30 rounded-2xl flex items-center justify-center">
+              <Mic className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-foreground">
+                Add Voice Over
+              </h2>
+              <div className="flex items-center gap-2 mt-1">
+                <Badge
+                  variant="secondary"
+                  className="text-xs bg-blue-medium/10 text-blue-medium border-blue-medium/20"
+                >
+                  AI Powered
+                </Badge>
+                <Sparkles className="w-3 h-3 text-muted-foreground" />
+              </div>
             </div>
           </div>
-        ) : (
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button
-              variant="default"
-              disabled={!voiceOverText}
-              onClick={handleSubmit}
-            >
-              Submit
-            </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="h-8 w-8 rounded-xl hover:bg-muted/80"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 space-y-6">
+          {/* AI Generate Section */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium text-foreground">
+                Voice Over Script
+              </label>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleGenerateUsingAI}
+                disabled={loading || !selectedVideo}
+                className="h-8 px-3 text-xs bg-gradient-to-r from-primary/10 to-accent/10 hover:from-primary/20 hover:to-accent/20 border-primary/20"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Bot className="w-3 h-3 mr-2" />
+                    Generate with AI
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {loading ? (
+              <div className="relative">
+                <Textarea
+                  className="min-h-[200px] bg-muted/30 border-border/50 resize-none"
+                  placeholder="Enter voice over text here..."
+                  value="Generating script..."
+                  disabled
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-card/50 backdrop-blur-sm rounded-lg">
+                  <div className="flex items-center gap-3 text-muted-foreground">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span className="text-sm font-medium">
+                      AI is generating your script...
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <Textarea
+                className="min-h-[200px] bg-background/80 border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 resize-none rounded-xl"
+                placeholder="Enter your voice over script here, or use AI to generate one automatically..."
+                value={voiceOverText}
+                onChange={(e) => setVoiceOverText(e.target.value)}
+              />
+            )}
+          </div>
+
+          {/* Processing Steps */}
+          {loadingVoiceOver && (
+            <Card className="p-6 bg-muted/20 border-border/30">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-accent/30 rounded-xl flex items-center justify-center">
+                  <Volume2 className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                    <span className="text-sm font-medium text-foreground">
+                      {loadingStep === 0 && "Converting text to speech..."}
+                      {loadingStep === 1 && "Merging audio and video..."}
+                      {loadingStep === 2 && "Finalizing your video..."}
+                    </span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div
+                      className="bg-gradient-to-r from-primary to-accent h-2 rounded-full transition-all duration-1000"
+                      style={{ width: `${((loadingStep + 1) / 3) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </Card>
+          )}
+        </div>
+
+        {/* Footer */}
+        {!loadingVoiceOver && (
+          <div className="flex items-center justify-between p-6 border-t border-border/50 bg-muted/20">
+            <p className="text-xs text-muted-foreground">
+              AI will convert your text to natural speech and merge it with the
+              video
+            </p>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                disabled={!voiceOverText}
+                className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+              >
+                <Mic className="w-4 h-4 mr-2" />
+                Generate Voice Over
+              </Button>
+            </div>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 };

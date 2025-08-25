@@ -1,6 +1,6 @@
-# EduVideo AI - Educational Video Generation Platform
+# Vistruct - AI-Powered Visual Instruction Platform
 
-A full-stack web application that enables users to create engaging educational videos using AI-powered content generation. The platform combines video processing, AI chat interactions, automated video creation, and AI voice-over generation to streamline educational content production. Users can generate complete educational content including scripts, voice-overs, and visual animations through an intuitive chat interface.
+A full-stack web application that enables users to create engaging educational videos using AI-powered visual instruction. The platform combines video processing, AI chat interactions, automated video creation, and AI voice-over generation to streamline educational content production. Users can generate complete educational content including scripts, voice-overs, and visual animations through an intuitive chat interface.
 
 ## 🚀 Features
 
