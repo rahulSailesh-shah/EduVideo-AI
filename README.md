@@ -209,22 +209,6 @@ The platform uses Manim for video generation and AI for content creation:
 5. **Timeout Handling**: Automatic timeout for long-running renders
 6. **File Management**: Automatic cleanup of temporary files
 
-## 🚀 Deployment
-
-### Production Deployment
-
-1. **Environment**: Set `ENVIRONMENT=production`
-2. **Database**: Use production PostgreSQL instance
-3. **Security**: Configure proper CORS and security headers
-4. **SSL**: Enable HTTPS for production
-5. **Monitoring**: Add logging and monitoring
-
-### Docker Deployment
-
-```bash
-# Build and run with Docker Compose
-docker-compose -f docker-compose.prod.yml up -d
-```
 
 ## 🤝 Contributing
 
