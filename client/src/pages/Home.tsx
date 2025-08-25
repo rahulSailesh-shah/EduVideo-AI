@@ -54,6 +54,7 @@ const Home = () => {
         const data = await res.json();
         setProjects(data);
       } catch (error) {
+        console.error(error);
         toast({
           title: "Error",
           description: "Failed to load projects.",

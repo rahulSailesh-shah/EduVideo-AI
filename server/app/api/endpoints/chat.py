@@ -25,7 +25,4 @@ def get_chat_endpoint(chat_id: int, db: Session = Depends(get_db)):
 @router.get("/user/{user_id}", response_model=list[Chat])
 def get_chats_by_user_endpoint(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     chats = get_chats_by_user_id(db=db, user_id=current_user.id)
-    if not chats:
-        raise HTTPException(status_code=404, detail="No chats found for this user")
-    # print(f"Retrieved {len(chats)} chats for user {current_user.id}")
     return chats

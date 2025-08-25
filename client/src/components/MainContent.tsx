@@ -8,7 +8,6 @@ import { VideoData } from "@/pages/Project";
 interface MainContentProps {
   code: string;
   videoData: VideoData[];
-  onVideoRefresh?: () => void; // Add callback to refresh videos
 }
 
 export const MainContent = ({ code, videoData }: MainContentProps) => {

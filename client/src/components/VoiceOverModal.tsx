@@ -9,10 +9,8 @@ interface VoiceOverModalProps {
   onClose: () => void;
   voiceOverText: string;
   setVoiceOverText: (text: string) => void;
-  audioFile: File | null;
-  setAudioFile: (file: File | null) => void;
   selectedVideo: VideoData | null;
-  onVideoGenerated?: () => void; // Add callback to refresh videos
+  updateStreamURL: (url: string) => void;
 }
 
 export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
@@ -20,10 +18,8 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
   onClose,
   voiceOverText,
   setVoiceOverText,
-  audioFile,
-  setAudioFile,
   selectedVideo,
-  onVideoGenerated,
+  updateStreamURL,
 }) => {
   const [loading, setLoading] = useState(false);
   const [loadingVoiceOver, setLoadingVoiceOver] = useState(false);
@@ -110,17 +106,19 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
       }
 
       const data = await res.json();
-      console.log(data);
-      if (data.success) {
+
+      if (data.success && data.video_url) {
         toast({
           title: "Success",
           description: "Video Generated Successfully",
         });
+        const videoUrl: string = data.video_url;
+        updateStreamURL(videoUrl);
+        // await fetchVideos();
       }
       setLoadingVoiceOver(false);
       setVoiceOverText("");
       onClose();
-      window.location.reload();
     } catch (error) {
       console.error("Error submitting voice over:", error);
       toast({
@@ -190,7 +188,7 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
             </Button>
             <Button
               variant="default"
-              disabled={!voiceOverText && !audioFile}
+              disabled={!voiceOverText}
               onClick={handleSubmit}
             >
               Submit

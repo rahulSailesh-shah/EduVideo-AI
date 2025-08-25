@@ -20,6 +20,7 @@ interface Message {
 interface ChatInterfaceProps {
   setCode: (code: string) => void;
   setVideoData: React.Dispatch<React.SetStateAction<VideoData[]>>;
+  onVideoDataRefresh: (fetchVideos: () => Promise<void>) => void;
 }
 
 function extractCodeAndExplanation(input: string): {
@@ -37,6 +38,7 @@ function extractCodeAndExplanation(input: string): {
 export const ChatInterface = ({
   setCode,
   setVideoData,
+  onVideoDataRefresh,
 }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -137,7 +139,12 @@ export const ChatInterface = ({
       fetchMessages();
       fetchVideos();
     }
-  }, [fetchMessages, fetchVideos, loading, token]); // Add all dependencies
+  }, [fetchMessages, fetchVideos, loading, token]);
+
+  // Pass the fetchVideos function to parent component
+  useEffect(() => {
+    onVideoDataRefresh(fetchVideos);
+  }, [fetchVideos, onVideoDataRefresh]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

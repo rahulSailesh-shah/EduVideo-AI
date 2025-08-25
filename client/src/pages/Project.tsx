@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ChatInterface } from "@/components/ChatInterface";
 import { MainContent } from "@/components/MainContent";
 import { Navbar } from "@/components/Navbar";
-import { useToast } from "@/hooks/use-toast";
 
 export interface VideoData {
   id: number;
@@ -20,6 +19,9 @@ const Project = () => {
 
   const [code, setCode] = useState("");
   const [videoData, setVideoData] = useState<VideoData[]>([]);
+  const [fetchVideos, setFetchVideos] = useState<(() => Promise<void>) | null>(
+    null
+  );
 
   const handleCreateNew = () => {
     const newProjectId = Date.now().toString();
@@ -41,7 +43,13 @@ const Project = () => {
       <div className="flex flex-1">
         {/* Chat Interface */}
         <div className="w-1/3 border-r border-border">
-          <ChatInterface setCode={setCode} setVideoData={setVideoData} />
+          <ChatInterface
+            setCode={setCode}
+            setVideoData={setVideoData}
+            onVideoDataRefresh={(fetchVideos) =>
+              setFetchVideos(() => fetchVideos)
+            }
+          />
         </div>
 
         {/* Main Content Area */}

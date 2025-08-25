@@ -2,6 +2,7 @@ import uuid
 import boto3
 from urllib.parse import urlparse
 import re
+import time
 from botocore.exceptions import  ClientError
 from fastapi import HTTPException
 from app.core.config import settings
@@ -27,23 +28,31 @@ class S3UploadService:
                 fileobj = io.BytesIO(video_data)
             else:
                 fileobj = video_data
-            self.s3.upload_fileobj(fileobj, self.bucket, s3_key, ExtraArgs={"ContentType": "video/mp4"})
-            s3_url = f"https://{self.bucket}.s3.amazonaws.com/{s3_key}"
+            self.s3.upload_fileobj(fileobj, self.bucket, s3_key, ExtraArgs={
+                        "ContentType": "video/mp4",
+                        "CacheControl": "no-cache, no-store, must-revalidate",
+                        "Expires": "0"
+                    })
+            timestamp = int(time.time())
+            s3_url = f"https://{self.bucket}.s3.amazonaws.com/{s3_key}?v={timestamp}"
             return s3_url
         except Exception as e:
             raise RuntimeError(f"Failed to upload video to S3: {e}")
 
     def parse_s3_url(self, s3_url: str) -> tuple[str, str]:
-        if s3_url.startswith('s3://'):
-            parsed = urlparse(s3_url)
+        # Remove query parameters (like cache-busting timestamps) before parsing
+        clean_url = s3_url.split('?')[0]
+
+        if clean_url.startswith('s3://'):
+            parsed = urlparse(clean_url)
             bucket = parsed.netloc
             key = parsed.path.lstrip('/')
-        elif 's3.amazonaws.com' in s3_url:
-            if s3_url.startswith('https://s3.amazonaws.com/'):
-                path = s3_url.replace('https://s3.amazonaws.com/', '')
+        elif 's3.amazonaws.com' in clean_url:
+            if clean_url.startswith('https://s3.amazonaws.com/'):
+                path = clean_url.replace('https://s3.amazonaws.com/', '')
                 bucket, key = path.split('/', 1)
             else:
-                match = re.match(r'https://(.+?)\.s3\.amazonaws\.com/(.+)', s3_url)
+                match = re.match(r'https://(.+?)\.s3\.amazonaws\.com/(.+)', clean_url)
                 if match:
                     bucket, key = match.groups()
                 else:
@@ -73,9 +82,14 @@ class S3UploadService:
                     video_file,
                     bucket,
                     key,
-                    ExtraArgs={"ContentType": "video/mp4"}
+                    ExtraArgs={
+                        "ContentType": "video/mp4",
+                        "CacheControl": "no-cache, no-store, must-revalidate",
+                        "Expires": "0"
+                    }
                 )
-            return s3_url
+            timestamp = int(time.time())
+            return f"{s3_url}?v={timestamp}"
         except FileNotFoundError:
             raise FileNotFoundError(f"Video file not found at path: {video_path}")
         except Exception as e:

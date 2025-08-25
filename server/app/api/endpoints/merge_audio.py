@@ -8,7 +8,7 @@ from app.crud.video import get_video, update_video
 from app.api.dependencies import get_current_user
 from app.pipeline.llm import LLMService
 from app.core.config import settings
-from app.schemas.video import Video
+from app.schemas.video import Video, VideoCreate
 from app.crud.message import get_message
 from app.service.merger import VideoAudioMerger
 from app.service.upload import S3UploadService
@@ -20,6 +20,8 @@ from pydantic import BaseModel
 class MergeAudioResponse(BaseModel):
     success: bool
     video_url: str
+    chat_id: int = None
+    message_id: int = None
 
 router = APIRouter()
 
@@ -63,17 +65,20 @@ def merge_audio_endpoint(videoData: Video, db: Session = Depends(get_db), curren
             s3_video_url=s3_url,
             audio_file_path=str(filePath),
         )
-        print(f"Video merged successfully: {output_path}")
-
         updated_video_url = upload_service.update_video_from_path(s3_url=s3_url, video_path=output_path)
-        print(f"Video uploaded successfully: {updated_video_url}")
+        generated_video = VideoCreate(
+                    chat_id=message.chat_id,
+                    video_url=updated_video_url,
+                    message_id=message.id
+                )
+        update_video(db=db, video_id=video_id, video=generated_video)
 
-        # Delete the local video file after upload
         output_path = Path.cwd() / str(output_path)
         if output_path.exists():
             output_path.unlink()
+        return MergeAudioResponse(success=True, video_url=updated_video_url, chat_id=message.chat_id, message_id=message.id)
 
-
-        return MergeAudioResponse(success=True, video_url=updated_video_url)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to generate script: {str(e)}")
+        import traceback
+        error_details = traceback.format_exc()
+        raise HTTPException(status_code=500, detail=f"Failed to process video: {str(e)}")

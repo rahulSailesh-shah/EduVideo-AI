@@ -70,6 +70,7 @@ async def google_auth(
 
         # Check if user exists
         user = get_user_by_oauth_id(db, "google", google_id)
+        print(google_id, user)
 
         if not user:
             # Check if user exists with same email

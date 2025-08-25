@@ -3,7 +3,7 @@ import React from "react";
 interface VideoPlayerProps {
   streamURL: string;
   videoRef: React.RefObject<HTMLVideoElement>;
-  handleVideoError: () => void;
+  handleVideoError: (error: unknown) => void;
   handleVideoLoad: () => void;
   setLoading: (loading: boolean) => void;
 }
@@ -23,7 +23,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         preload="metadata"
         className="w-full h-auto rounded-lg"
         style={{ background: "#000" }}
-        onError={handleVideoError}
+        onError={(e) => handleVideoError(e)}
         onLoadedData={handleVideoLoad}
         onLoadStart={() => setLoading(true)}
       >
