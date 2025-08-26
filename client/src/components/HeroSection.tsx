@@ -92,17 +92,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onLoginClick }) => {
       <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
         {/* Main Hero Content */}
         <div className="mb-16">
-          <div className="inline-flex items-center gap-2 bg-card/90 backdrop-blur-sm border border-border text-primary px-6 py-3 rounded-full text-sm font-medium mb-8 shadow-lg">
+          <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 dark:text-primary text-yellow-700 px-6 py-3 rounded-full text-sm font-semibold mb-8 shadow-soft">
             <Sparkles className="w-4 h-4 text-accent" />
             AI-Powered Educational Content
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6 leading-tight">
             Create Amazing
-            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              {" "}
-              Educational{" "}
-            </span>
+            <span className="text-primary"> Educational </span>
             Videos
           </h1>
 
@@ -114,7 +111,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onLoginClick }) => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button
               onClick={onLoginClick}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 h-auto text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+              size="lg"
+              className="text-lg px-8 py-4"
             >
               Get Started
               <ArrowRight className="w-5 h-5 ml-2" />
@@ -122,7 +120,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onLoginClick }) => {
 
             <Button
               variant="outline"
-              className="border-2 border-border hover:border-primary hover:bg-muted bg-card/80 backdrop-blur-sm px-8 py-4 h-auto text-lg font-medium rounded-xl transition-all duration-300"
+              size="lg"
+              className="text-lg px-8 py-4 hover:text-yellow-700 dark:hover:text-primary"
             >
               <Play className="w-5 h-5 mr-2" />
               Watch Demo
@@ -132,45 +131,45 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onLoginClick }) => {
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
-          <Card className="group bg-card/80 backdrop-blur-sm border border-border hover:border-primary/50 transition-all duration-300 hover:scale-105 rounded-2xl shadow-md hover:shadow-xl">
+          <Card className="group bg-card border border-border hover:border-primary/50 hover:shadow-medium transition-all duration-300 hover:scale-105 rounded-2xl">
             <CardContent className="p-8 text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-accent/30 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:from-primary/30 group-hover:to-accent/40 transition-all duration-300 shadow-lg">
+              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-all duration-300">
                 <Zap className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-foreground">
+              <h3 className="text-xl font-bold mb-3 text-foreground">
                 Lightning Fast
               </h3>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground leading-relaxed">
                 Create professional educational videos in minutes with our
                 AI-powered tools.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="group bg-card/80 backdrop-blur-sm border border-border hover:border-primary/50 transition-all duration-300 hover:scale-105 rounded-2xl shadow-md hover:shadow-xl">
+          <Card className="group bg-card border border-border hover:border-primary/50 hover:shadow-medium transition-all duration-300 hover:scale-105 rounded-2xl">
             <CardContent className="p-8 text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-primary/30 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:from-accent/30 group-hover:to-primary/40 transition-all duration-300 shadow-lg">
-                <Sparkles className="w-8 h-8 text-primary" />
+              <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-accent/20 transition-all duration-300">
+                <Sparkles className="w-8 h-8 text-accent" />
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-foreground">
+              <h3 className="text-xl font-bold mb-3 text-foreground">
                 AI-Powered
               </h3>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground leading-relaxed">
                 Leverage advanced AI to generate scripts, voiceovers, and visual
                 content automatically.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="group bg-card/80 backdrop-blur-sm border border-border hover:border-primary/50 transition-all duration-300 hover:scale-105 rounded-2xl shadow-md hover:shadow-xl">
+          <Card className="group bg-card border border-border hover:border-primary/50 hover:shadow-medium transition-all duration-300 hover:scale-105 rounded-2xl">
             <CardContent className="p-8 text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-muted-foreground/20 to-primary/30 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:from-muted-foreground/30 group-hover:to-primary/40 transition-all duration-300 shadow-lg">
-                <Users className="w-8 h-8 text-primary" />
+              <div className="w-16 h-16 bg-secondary/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-secondary/20 transition-all duration-300">
+                <Users className="w-8 h-8 text-secondary" />
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-foreground">
+              <h3 className="text-xl font-bold mb-3 text-foreground">
                 Engaging Content
               </h3>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground leading-relaxed">
                 Create videos that captivate your audience and enhance learning
                 outcomes.
               </p>

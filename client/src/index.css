@@ -2,119 +2,120 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here.
-All colors MUST be HSL.
+/* Inspired by Mailchimp design system
+   Bold yellow, playful accents, warm neutrals
+   All colors in HSL
 */
 
 @layer base {
   :root {
-    /* New Blue-Grey Palette - Light Mode */
-    --background: 210 23% 93%; /* #DDE6ED - Very light blue-grey background */
-    --foreground: 211 24% 29%; /* #27374D - Dark navy for text */
+    /* Light Mode */
+    --background: 48 100% 97%; /* Soft warm background (#FFFDF7) */
+    --foreground: 210 15% 15%; /* Dark neutral text (#2E2E2E) */
 
-    --card: 0 0% 100%; /* White cards for contrast */
-    --card-foreground: 211 24% 29%;
+    --card: 0 0% 100%; /* White cards */
+    --card-foreground: 210 15% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 211 24% 29%;
+    --popover-foreground: 210 15% 15%;
 
-    --primary: 210 22% 50%; /* #526D82 - Medium blue-grey */
-    --primary-foreground: 210 23% 93%;
+    --primary: 48 100% 50%; /* Mailchimp Yellow (#FFD633) */
+    --primary-foreground: 210 15% 15%;
 
-    --secondary: 210 23% 93%; /* #DDE6ED - Very light blue-grey */
-    --secondary-foreground: 210 22% 50%;
+    --secondary: 180 60% 40%; /* Teal accent (#009688) */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 20% 88%; /* Slightly darker than background */
-    --muted-foreground: 210 15% 45%;
+    --muted: 210 20% 90%; /* Soft neutral grey */
+    --muted-foreground: 210 10% 40%;
 
-    --accent: 210 22% 50%; /* #526D82 - Medium blue-grey */
-    --accent-foreground: 210 23% 93%;
+    --accent: 15 80% 55%; /* Coral accent (#FF6F61) */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 80% 55%; /* Strong red */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 210 18% 85%; /* Subtle border */
-    --input: 0 0% 100%; /* White input fields */
-    --ring: 210 22% 50%; /* #526D82 for focus rings */
+    --border: 210 15% 80%; /* Light neutral border */
+    --input: 0 0% 100%;
+    --ring: 48 100% 50%; /* Yellow for focus */
 
-    /* Custom design tokens with new palette */
     --gradient-primary: linear-gradient(
       135deg,
-      hsl(210 22% 50%),
-      /* #526D82 */ hsl(211 24% 29%) /* #27374D */
+      hsl(48 100% 50%),
+      hsl(15 80% 55%)
     );
     --gradient-secondary: linear-gradient(
       180deg,
-      hsl(210 23% 93%),
-      /* #DDE6ED */ hsl(210 19% 75%) /* #9DB2BF */
+      hsl(180 60% 40%),
+      hsl(200 70% 45%)
     );
-    --shadow-soft: 0 2px 8px hsl(211 24% 29% / 0.15);
-    --shadow-medium: 0 4px 16px hsl(211 24% 29% / 0.25);
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow-soft: 0 2px 8px hsl(210 15% 15% / 0.1);
+    --shadow-medium: 0 4px 16px hsl(210 15% 15% / 0.2);
 
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --radius: 0.5rem;
 
-    --sidebar-background: 210 22% 50%; /* #526D82 */
-    --sidebar-foreground: 210 23% 93%;
-    --sidebar-primary: 211 24% 29%; /* #27374D */
-    --sidebar-primary-foreground: 210 23% 93%;
-    --sidebar-accent: 210 19% 75%; /* #9DB2BF */
-    --sidebar-accent-foreground: 211 24% 29%;
-    --sidebar-border: 210 18% 40%;
-    --sidebar-ring: 210 22% 50%;
+    /* Sidebar */
+    --sidebar-background: 48 100% 50%;
+    --sidebar-foreground: 210 15% 15%;
+    --sidebar-primary: 210 15% 15%;
+    --sidebar-primary-foreground: 48 100% 50%;
+    --sidebar-accent: 15 80% 55%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 210 15% 40%;
+    --sidebar-ring: 48 100% 50%;
   }
 
   .dark {
-    /* New Blue-Grey Palette - Dark Mode (Much Darker) */
-    --background: 211 35% 15%; /* Much darker navy background */
-    --foreground: 210 23% 95%; /* Very light text on dark background */
+    /* Dark Mode */
+    --background: 210 15% 12%; /* Deep neutral */
+    --foreground: 48 100% 97%; /* Light text */
 
-    --card: 211 30% 22%; /* Darker blue-grey cards */
-    --card-foreground: 210 23% 95%;
+    --card: 210 15% 18%;
+    --card-foreground: 48 100% 97%;
 
-    --popover: 211 30% 22%;
-    --popover-foreground: 210 23% 95%;
+    --popover: 210 15% 18%;
+    --popover-foreground: 48 100% 97%;
 
-    --primary: 210 23% 95%; /* Very light blue-grey for primary in dark mode */
-    --primary-foreground: 211 35% 15%;
+    --primary: 48 100% 50%;
+    --primary-foreground: 210 15% 12%;
 
-    --secondary: 211 30% 22%; /* Darker secondary */
-    --secondary-foreground: 210 23% 95%;
+    --secondary: 180 60% 40%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 211 30% 22%; /* Darker muted */
+    --muted: 210 15% 20%;
     --muted-foreground: 210 15% 65%;
 
-    --accent: 210 20% 45%; /* Darker accent */
-    --accent-foreground: 210 23% 95%;
+    --accent: 15 80% 55%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62.8% 50%;
-    --destructive-foreground: 210 23% 95%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 48 100% 97%;
 
-    --border: 211 25% 25%; /* Darker border in dark mode */
-    --input: 211 30% 22%; /* Darker input fields */
-    --ring: 210 23% 95%; /* Bright ring for focus */
+    --border: 210 15% 25%;
+    --input: 210 15% 18%;
+    --ring: 48 100% 50%;
 
     --gradient-primary: linear-gradient(
       135deg,
-      hsl(211 35% 15%),
-      /* Much darker navy */ hsl(211 30% 22%) /* Darker blue-grey */
+      hsl(48 100% 50%),
+      hsl(15 80% 55%)
     );
     --gradient-secondary: linear-gradient(
       180deg,
-      hsl(211 30% 22%),
-      /* Darker blue-grey */ hsl(210 20% 45%) /* Darker accent */
+      hsl(180 60% 40%),
+      hsl(200 70% 45%)
     );
-    --shadow-soft: 0 2px 8px hsl(211 40% 8% / 0.8);
-    --shadow-medium: 0 4px 16px hsl(211 40% 8% / 0.9);
+    --shadow-soft: 0 2px 8px hsl(210 15% 5% / 0.6);
+    --shadow-medium: 0 4px 16px hsl(210 15% 5% / 0.8);
 
-    --sidebar-background: 211 30% 22%; /* Darker sidebar */
-    --sidebar-foreground: 210 23% 95%;
-    --sidebar-primary: 211 35% 15%; /* Much darker primary */
-    --sidebar-primary-foreground: 210 23% 95%;
-    --sidebar-accent: 210 20% 45%; /* Darker accent */
-    --sidebar-accent-foreground: 210 23% 95%;
-    --sidebar-border: 211 25% 25%;
-    --sidebar-ring: 210 23% 95%;
+    --sidebar-background: 210 15% 18%;
+    --sidebar-foreground: 48 100% 97%;
+    --sidebar-primary: 48 100% 50%;
+    --sidebar-primary-foreground: 210 15% 12%;
+    --sidebar-accent: 15 80% 55%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 210 15% 30%;
+    --sidebar-ring: 48 100% 50%;
   }
 }
 
@@ -123,7 +124,100 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    font-family: "IBM Plex Sans", "Helvetica Neue", "Arial", sans-serif;
+    font-size: 16px;
+  }
+
   body {
     @apply bg-background text-foreground;
+    font-family: "IBM Plex Sans", "Helvetica Neue", "Arial", sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0.005em;
+  }
+
+  h1 {
+    font-family: "IBM Plex Sans", "Helvetica Neue", "Arial", sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+
+  h2 {
+    font-family: "IBM Plex Sans", "Helvetica Neue", "Arial", sans-serif;
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  h3 {
+    font-family: "IBM Plex Sans", "Helvetica Neue", "Arial", sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+  }
+
+  h4 {
+    font-family: "IBM Plex Sans", "Helvetica Neue", "Arial", sans-serif;
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+
+  h5 {
+    font-family: "IBM Plex Sans", "Helvetica Neue", "Arial", sans-serif;
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: -0.005em;
+  }
+
+  h6 {
+    font-family: "IBM Plex Sans", "Helvetica Neue", "Arial", sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  button {
+    font-family: "IBM Plex Sans", "Helvetica Neue", "Arial", sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  input,
+  textarea,
+  select {
+    font-family: "IBM Plex Sans", "Helvetica Neue", "Arial", sans-serif;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  .text-sm {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .text-xs {
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .text-lg {
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+
+  .text-xl {
+    font-size: 1.25rem;
+    line-height: 1.6;
   }
 }

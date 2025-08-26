@@ -49,14 +49,14 @@ export const Navbar = ({ onCreateNew, onBack, showBack }: NavbarProps) => {
 
   return (
     <>
-      <nav className="h-16 border-b border-border/50 bg-card/80 backdrop-blur-xl px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+      <nav className="h-16 border-b border-border/50 bg-background/95 backdrop-blur-xl px-6 flex items-center justify-between sticky top-0 z-50 shadow-soft">
         <div className="flex items-center gap-6">
           {showBack && onBack && (
             <Button
               variant="ghost"
               size="sm"
               onClick={onBack}
-              className="gap-2 hover:bg-blue-lightest/50 dark:hover:bg-blue-medium/20 transition-colors duration-200 rounded-lg"
+              className="gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="hidden sm:inline">Back</span>
@@ -77,21 +77,13 @@ export const Navbar = ({ onCreateNew, onBack, showBack }: NavbarProps) => {
 
         <div className="flex items-center gap-3">
           {isAuthenticated && (
-            <Button
-              onClick={onCreateNew}
-              className="bg-blue-medium hover:bg-blue-dark text-white gap-2 px-4 py-2 h-9 font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border-0"
-            >
+            <Button onClick={onCreateNew} className="gap-2">
               <Plus className="w-4 h-4" />
               <span className="hidden sm:inline">New Project</span>
             </Button>
           )}
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleTheme}
-            className="hover:bg-blue-light dark:hover:bg-blue-medium/20 transition-colors duration-200 rounded-lg w-9 h-9 p-0"
-          >
+          <Button variant="ghost" size="icon" onClick={toggleTheme}>
             {theme === "dark" ? (
               <Sun className="w-4 h-4" />
             ) : (
@@ -102,12 +94,9 @@ export const Navbar = ({ onCreateNew, onBack, showBack }: NavbarProps) => {
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="gap-2 hover:bg-blue-lightest/50 hover:text-blue-dark dark:hover:text-blue-lightest dark:hover:bg-blue-medium/20 transition-colors duration-200 rounded-lg px-3 h-9"
-                >
-                  <div className="w-6 h-6 bg-blue-medium/20 rounded-full flex items-center justify-center">
-                    <User className="w-3 h-3 text-blue-medium" />
+                <Button variant="ghost" className="gap-2 px-3 h-9">
+                  <div className="w-6 h-6 bg-primary/20 rounded-full flex items-center justify-center">
+                    <User className="w-3 h-3 text-primary" />
                   </div>
                   <span className="hidden md:inline font-medium">
                     {user?.username}
@@ -116,12 +105,12 @@ export const Navbar = ({ onCreateNew, onBack, showBack }: NavbarProps) => {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-56 rounded-xl border border-border/50 bg-card/95 backdrop-blur-xl shadow-xl"
+                className="w-56 rounded-xl border border-border/50 bg-card/95 backdrop-blur-xl shadow-medium"
               >
                 <DropdownMenuLabel className="px-4 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-medium/20 rounded-full flex items-center justify-center">
-                      <User className="w-4 h-4 text-blue-medium" />
+                    <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                      <User className="w-4 h-4 text-primary" />
                     </div>
                     <div>
                       <p className="font-medium">{user?.username}</p>
@@ -134,7 +123,7 @@ export const Navbar = ({ onCreateNew, onBack, showBack }: NavbarProps) => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleSettingsClick}
-                  className="px-4 py-3 hover:bg-blue-lightest/50 dark:hover:bg-blue-medium/20 transition-colors duration-200 rounded-lg mx-2 my-1"
+                  className="px-4 py-3 rounded-lg mx-2 my-1"
                 >
                   <Settings className="w-4 h-4 mr-3" />
                   Settings
@@ -142,7 +131,7 @@ export const Navbar = ({ onCreateNew, onBack, showBack }: NavbarProps) => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleLogout}
-                  className="px-4 py-3 hover:bg-destructive/10 text-destructive hover:text-destructive transition-colors duration-200 rounded-lg mx-2 my-1"
+                  className="px-4 py-3 hover:bg-destructive/10 text-destructive hover:text-destructive rounded-lg mx-2 my-1"
                 >
                   <LogOut className="w-4 h-4 mr-3" />
                   Logout
@@ -150,10 +139,7 @@ export const Navbar = ({ onCreateNew, onBack, showBack }: NavbarProps) => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button
-              onClick={() => setIsLoginModalOpen(true)}
-              className="bg-blue-medium hover:bg-blue-dark text-white gap-2 px-4 py-2 h-9 font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border-0"
-            >
+            <Button onClick={() => setIsLoginModalOpen(true)} className="gap-2">
               <LogIn className="w-4 h-4" />
               <span className="hidden sm:inline">Login</span>
             </Button>

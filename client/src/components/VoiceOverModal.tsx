@@ -140,21 +140,21 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <Card className="w-full max-w-2xl mx-4 bg-card/95 backdrop-blur-xl border-border/50 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-300">
+      <Card className="w-full max-w-2xl mx-4 bg-card/95 backdrop-blur-xl border-border/50 shadow-medium animate-in fade-in-0 zoom-in-95 duration-300 rounded-3xl">
         {/* Modern Header */}
         <div className="flex items-center justify-between p-6 border-b border-border/50">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-accent/30 rounded-2xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
               <Mic className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-foreground">
+              <h2 className="text-xl font-bold text-foreground">
                 Add Voice Over
               </h2>
               <div className="flex items-center gap-2 mt-1">
                 <Badge
                   variant="secondary"
-                  className="text-xs bg-blue-medium/10 text-blue-medium border-blue-medium/20"
+                  className="text-xs bg-primary/10 text-primary border-primary/20"
                 >
                   AI Powered
                 </Badge>
@@ -185,7 +185,7 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
                 size="sm"
                 onClick={handleGenerateUsingAI}
                 disabled={loading || !selectedVideo}
-                className="h-8 px-3 text-xs bg-gradient-to-r from-primary/10 to-accent/10 hover:from-primary/20 hover:to-accent/20 border-primary/20"
+                className="h-8 px-3 text-xs"
               >
                 {loading ? (
                   <>
@@ -220,7 +220,7 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
               </div>
             ) : (
               <Textarea
-                className="min-h-[200px] bg-background/80 border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 resize-none rounded-xl"
+                className="min-h-[200px] bg-background border-border focus:border-primary focus:ring-2 focus:ring-primary/20 resize-none rounded-xl"
                 placeholder="Enter your voice over script here, or use AI to generate one automatically..."
                 value={voiceOverText}
                 onChange={(e) => setVoiceOverText(e.target.value)}
@@ -230,9 +230,9 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
 
           {/* Processing Steps */}
           {loadingVoiceOver && (
-            <Card className="p-6 bg-muted/20 border-border/30">
+            <Card className="p-6 bg-primary/5 border-primary/20 rounded-xl">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-accent/30 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
                   <Volume2 className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1">
@@ -246,7 +246,7 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
                   </div>
                   <div className="w-full bg-muted rounded-full h-2">
                     <div
-                      className="bg-gradient-to-r from-primary to-accent h-2 rounded-full transition-all duration-1000"
+                      className="bg-primary h-2 rounded-full transition-all duration-1000"
                       style={{ width: `${((loadingStep + 1) / 3) * 100}%` }}
                     />
                   </div>
@@ -258,7 +258,7 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
 
         {/* Footer */}
         {!loadingVoiceOver && (
-          <div className="flex items-center justify-between p-6 border-t border-border/50 bg-muted/20">
+          <div className="flex items-center justify-between p-6 border-t border-border/50 bg-muted/10 rounded-b-3xl">
             <p className="text-xs text-muted-foreground">
               AI will convert your text to natural speech and merge it with the
               video
@@ -267,11 +267,7 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
               <Button variant="outline" onClick={onClose}>
                 Cancel
               </Button>
-              <Button
-                onClick={handleSubmit}
-                disabled={!voiceOverText}
-                className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-              >
+              <Button onClick={handleSubmit} disabled={!voiceOverText}>
                 <Mic className="w-4 h-4 mr-2" />
                 Generate Voice Over
               </Button>

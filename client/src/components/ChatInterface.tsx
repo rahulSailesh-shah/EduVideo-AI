@@ -236,47 +236,39 @@ export const ChatInterface = ({
       <div className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center py-12">
-            <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-accent/30 rounded-2xl flex items-center justify-center mb-4">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 shadow-soft">
               <Bot className="w-8 h-8 text-primary" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">
+            <h3 className="text-xl font-bold text-foreground mb-2">
               Let's Create Something Amazing!
             </h3>
-            <p className="text-muted-foreground max-w-md">
+            <p className="text-muted-foreground max-w-md leading-relaxed">
               Describe the educational video you'd like to create and I'll help
               you bring it to life with AI.
             </p>
           </div>
         )}
 
-        {messages.map((message) => (
+        {/* {messages.map((message) => (
           <div
             key={message.id}
             className={cn(
-              "flex gap-4 max-w-4xl animate-in slide-in-from-bottom-2 duration-300",
-              message.role === "user" ? "ml-auto flex-row-reverse" : ""
+              "flex gap-3 animate-in slide-in-from-bottom-2 duration-300",
+              message.role === "user" ? "justify-end" : "justify-start"
             )}
           >
+            {message.role === "assistant" && (
+              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-muted/20 border border-border">
+                <Bot className="w-4 h-4 text-muted-foreground" />
+              </div>
+            )}
+
             <div
               className={cn(
-                "w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md",
+                "px-4 py-3 max-w-[75%] break-words rounded-[20px]",
                 message.role === "user"
-                  ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground"
-                  : "bg-gradient-to-br from-muted to-muted/80 text-muted-foreground border border-border"
-              )}
-            >
-              {message.role === "user" ? (
-                <User className="w-5 h-5" />
-              ) : (
-                <Bot className="w-5 h-5" />
-              )}
-            </div>
-            <div
-              className={cn(
-                "rounded-2xl px-5 py-4 max-w-[80%] shadow-sm backdrop-blur-sm",
-                message.role === "user"
-                  ? "bg-primary/90 text-primary-foreground ml-3"
-                  : "bg-card/80 border border-border text-card-foreground mr-3"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card border border-border text-card-foreground"
               )}
             >
               {message.id === "generating-status" ? (
@@ -292,13 +284,11 @@ export const ChatInterface = ({
                       style={{ animationDelay: "0.2s" }}
                     ></div>
                   </div>
-                  <span className="text-sm text-muted-foreground font-medium">
-                    {message.content}
-                  </span>
+                  <span className="text-sm font-medium">{message.content}</span>
                 </div>
               ) : message.role === "assistant" ? (
                 <div className="prose prose-sm max-w-none">
-                  <p className="text-sm leading-relaxed m-0">
+                  <p className="text-sm leading-relaxed m-0 text-foreground">
                     {extractCodeAndExplanation(message.content).explanation}
                   </p>
                 </div>
@@ -306,6 +296,70 @@ export const ChatInterface = ({
                 <p className="text-sm leading-relaxed">{message.content}</p>
               )}
             </div>
+
+            {message.role === "user" && (
+              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-primary/20">
+                <User className="w-4 h-4 text-primary" />
+              </div>
+            )}
+          </div>
+        ))} */}
+
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={cn(
+              "flex w-full items-end gap-2 animate-in slide-in-from-bottom-2 duration-300",
+              message.role === "user" ? "justify-end" : "justify-start"
+            )}
+          >
+            {/* Avatar */}
+            {message.role === "assistant" && (
+              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-muted/20 border border-border">
+                <Bot className="w-4 h-4 text-muted-foreground" />
+              </div>
+            )}
+
+            {/* Chat Bubble */}
+            <div
+              className={cn(
+                "relative px-4 py-3 max-w-[70%] break-words shadow-sm",
+                "rounded-2xl text-sm leading-relaxed",
+                message.role === "user"
+                  ? "bg-primary text-primary-foreground rounded-br-sm"
+                  : "bg-card border border-border text-card-foreground rounded-bl-sm"
+              )}
+            >
+              {message.id === "generating-status" ? (
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1">
+                    <span className="w-2 h-2 bg-primary rounded-full animate-bounce"></span>
+                    <span
+                      className="w-2 h-2 bg-primary rounded-full animate-bounce"
+                      style={{ animationDelay: "0.15s" }}
+                    ></span>
+                    <span
+                      className="w-2 h-2 bg-primary rounded-full animate-bounce"
+                      style={{ animationDelay: "0.3s" }}
+                    ></span>
+                  </div>
+                </div>
+              ) : message.role === "assistant" ? (
+                <div className="prose prose-sm max-w-none">
+                  <p className="m-0 text-foreground">
+                    {extractCodeAndExplanation(message.content).explanation}
+                  </p>
+                </div>
+              ) : (
+                <p className="m-0">{message.content}</p>
+              )}
+            </div>
+
+            {message.role === "user" && (
+              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-primary/20">
+                <User className="w-4 h-4 text-primary" />
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -313,12 +367,12 @@ export const ChatInterface = ({
       {/* Input */}
       <div className="border-t border-border/50 bg-card/50 backdrop-blur-sm">
         <form onSubmit={handleSubmit} className="p-6">
-          <div className="flex gap-4 items-end">
+          <div className="relative">
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Describe the educational video you'd like to create..."
-              className="min-h-[60px] max-h-[120px] resize-none rounded-xl border-2 border-border/50 bg-background/80 backdrop-blur-sm px-4 py-3 text-sm leading-relaxed focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+              className="h-[20px] max-h-[120px] resize-none rounded-xl border-2 border-border/50 bg-background/80 backdrop-blur-sm pl-4 pr-14 py-3 text-sm leading-relaxed focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -329,7 +383,12 @@ export const ChatInterface = ({
             <Button
               type="submit"
               disabled={!input.trim()}
-              className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 border-0 flex-shrink-0"
+              className={cn(
+                "absolute bottom-2 right-2 h-8 w-8 rounded-lg shadow-medium transition-all duration-200 border-0 flex-shrink-0",
+                input.trim()
+                  ? "bg-primary hover:bg-primary/90 text-primary-foreground"
+                  : "bg-muted hover:bg-muted/80 text-muted-foreground cursor-not-allowed"
+              )}
             >
               <Send className="w-4 h-4" />
             </Button>

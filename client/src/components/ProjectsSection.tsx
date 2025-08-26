@@ -104,7 +104,8 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         <div className="mb-6">
           <Button
             onClick={onCreateNew}
-            className="bg-blue-medium hover:bg-blue-dark text-white px-8 py-4 h-auto text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+            size="lg"
+            className="px-8 py-4 text-base"
           >
             <Plus className="w-5 h-5 mr-2" />
             Create New Project
@@ -118,15 +119,16 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
           {projects.map((project) => (
             <Card
               key={project.id}
-              className="group bg-card hover:bg-blue-lightest/50 dark:hover:bg-blue-medium/20 border border-border hover:border-blue-medium/30 dark:hover:border-blue-light/50 transition-all duration-300 hover:scale-105 hover:shadow-xl dark:hover:shadow-2xl dark:hover:shadow-blue-medium/10 rounded-2xl overflow-hidden backdrop-blur-sm cursor-pointer"
+              className="group bg-card hover:bg-primary/5 border border-border hover:border-primary/30 transition-all duration-300 hover:scale-105 hover:shadow-medium rounded-2xl overflow-hidden cursor-pointer"
+              onClick={() => onProjectClick(project.id)}
             >
               <CardHeader className="pb-4 pt-6 px-6">
                 <div className="flex items-start justify-between mb-4">
                   <div
-                    className="p-3 rounded-xl bg-blue-medium/10 group-hover:bg-blue-medium/20 dark:group-hover:bg-blue-light/30 transition-colors duration-300 cursor-pointer"
+                    className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300 cursor-pointer"
                     onClick={() => onProjectClick(project.id)}
                   >
-                    <Video className="w-6 h-6 text-blue-medium group-hover:text-blue-dark dark:group-hover:text-blue-lightest transition-colors duration-300" />
+                    <Video className="w-6 h-6 text-primary transition-colors duration-300" />
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-lg">
@@ -137,7 +139,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0 hover:bg-blue-medium/20 group-hover:opacity-100 transition-opacity duration-200"
+                          className="h-8 w-8 p-0 hover:bg-primary/20 group-hover:opacity-100 transition-opacity duration-200"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <MoreVertical className="w-4 h-4" />
@@ -170,12 +172,15 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                 </div>
 
                 {editingId === project.id ? (
-                  <div className="space-y-3">
+                  <div
+                    className="space-y-3"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <input
                       type="text"
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-medium/50"
+                      className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
                       autoFocus
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
@@ -188,15 +193,21 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        onClick={() => handleSaveEdit(project.id)}
-                        className="h-7 px-3 text-xs bg-blue-medium hover:bg-blue-dark"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSaveEdit(project.id);
+                        }}
+                        className="h-7 px-3 text-xs"
                       >
                         Save
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={handleCancelEdit}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCancelEdit();
+                        }}
                         className="h-7 px-3 text-xs"
                       >
                         Cancel
@@ -205,7 +216,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                   </div>
                 ) : (
                   <CardTitle
-                    className="text-lg leading-tight text-foreground group-hover:text-blue-dark dark:group-hover:text-blue-lightest transition-colors duration-300 font-semibold cursor-pointer"
+                    className="text-lg leading-tight text-foreground group-hover:text-primary transition-colors duration-300 font-bold cursor-pointer"
                     onClick={() => onProjectClick(project.id)}
                   >
                     {project.title}
@@ -213,7 +224,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                 )}
 
                 <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="w-12 h-1 bg-gradient-to-r from-blue-medium to-blue-dark dark:from-blue-light dark:to-blue-lightest rounded-full"></div>
+                  <div className="w-12 h-1 bg-primary rounded-full"></div>
                 </div>
               </CardHeader>
             </Card>
@@ -221,20 +232,21 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         </div>
       ) : (
         <div className="text-center py-20">
-          <div className="w-24 h-24 bg-blue-medium/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Video className="w-12 h-12 text-blue-medium" />
+          <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Video className="w-12 h-12 text-primary" />
           </div>
-          <h3 className="text-2xl font-semibold text-foreground mb-4">
+          <h3 className="text-2xl font-bold text-foreground mb-4">
             No projects yet
           </h3>
-          <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+          <p className="text-muted-foreground mb-8 max-w-md mx-auto leading-relaxed">
             Start creating your first educational video project and bring your
             ideas to life with AI.
           </p>
           <Button
             onClick={onCreateNew}
             variant="outline"
-            className="border-2 border-blue-medium/30 hover:border-blue-medium hover:bg-blue-lightest/50 dark:hover:bg-blue-medium/20 px-6 py-3 h-auto text-base font-medium rounded-xl transition-all duration-300"
+            size="lg"
+            className="px-6 py-3 text-base"
           >
             <Plus className="w-5 h-5 mr-2" />
             Create Your First Project
@@ -277,9 +289,9 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
 
           {/* Enhanced footer with improved button design */}
           <DialogFooter className="px-8 pb-8 pt-2">
-            <div className="flex flex-col sm:flex-row gap-3 w-full">
+            <div className="flex justify-end flex-col sm:flex-row gap-3 w-full">
               <Button
-                variant="secondary"
+                variant="outline"
                 onClick={handleCancelDelete}
                 className="flex-1 sm:flex-none sm:min-w-[120px] h-12 rounded-xl border-2 border-border hover:border-blue-medium/50  dark:hover:bg-blue-950/20 font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
               >

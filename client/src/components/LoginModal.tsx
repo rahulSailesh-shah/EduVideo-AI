@@ -50,14 +50,16 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg w-full max-h-[600px] min-h-[250px]">
+      <DialogContent className="sm:max-w-lg w-full max-h-[600px] min-h-[250px] rounded-3xl border-0 shadow-medium">
         <DialogHeader className="text-center space-y-4 pb-6">
-          <DialogTitle className="text-2xl font-bold">
-            Login to Vistruct
+          <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Chrome className="w-8 h-8 text-primary" />
+          </div>
+          <DialogTitle className="text-2xl font-bold text-foreground">
+            Welcome to Vistruct
           </DialogTitle>
-          <DialogDescription className="text-base text-muted-foreground">
-            Welcome back! Please sign in to continue creating amazing
-            educational videos.
+          <DialogDescription className="text-base text-muted-foreground leading-relaxed">
+            Sign in to continue creating amazing educational videos with AI
           </DialogDescription>
         </DialogHeader>
 
@@ -65,8 +67,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           {/* Google OAuth Button */}
           <Button
             type="button"
-            variant="outline"
-            className="w-full h-12 text-base font-medium border-2 border-blue-medium transition-all duration-300 group"
+            size="lg"
+            className="w-full text-base"
             onClick={handleGoogleLogin}
             disabled={isLoading}
           >
