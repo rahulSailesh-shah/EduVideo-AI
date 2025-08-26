@@ -1,5 +1,4 @@
-
-
+import math
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
@@ -14,6 +13,7 @@ from app.service.merger import VideoAudioMerger
 from app.service.upload import S3UploadService
 from pathlib import Path
 from pydantic import BaseModel
+import subprocess
 
 
 # Response schema
@@ -65,11 +65,17 @@ def merge_audio_endpoint(videoData: Video, db: Session = Depends(get_db), curren
             s3_video_url=s3_url,
             audio_file_path=str(filePath),
         )
+        result = subprocess.run([
+                    'ffprobe', '-v', 'quiet', '-show_entries',
+                    'format=duration', '-of', 'csv=p=0', str(output_path)
+                ], capture_output=True, text=True)
+        duration = float(result.stdout.strip())
         updated_video_url = upload_service.update_video_from_path(s3_url=s3_url, video_path=output_path)
         generated_video = VideoCreate(
                     chat_id=message.chat_id,
                     video_url=updated_video_url,
-                    message_id=message.id
+                    message_id=message.id,
+                    duration=math.ceil(duration) or 0,
                 )
         update_video(db=db, video_id=video_id, video=generated_video)
 

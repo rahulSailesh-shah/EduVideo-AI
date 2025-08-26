@@ -12,6 +12,7 @@ class Video(Base):
   video_url = Column(String, nullable=True)
   chat_id = Column(Integer, ForeignKey("chats.id"), nullable=False)
   message_id = Column(Integer, ForeignKey("messages.id"), nullable=False)
+  duration = Column(Integer, nullable=True)
 
   chat = relationship("Chat", back_populates="videos")
   message = relationship("Message", back_populates="videos")

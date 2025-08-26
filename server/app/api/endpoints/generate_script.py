@@ -39,13 +39,14 @@ def generate_script_endpoint(videoData: VideoDataWithMode, db: Session = Depends
         raise HTTPException(status_code=400, detail="Message content is empty")
 
     code = extract_code_from_content(content)
+    video_duration = videoData.duration
     mode = videoData.mode or "compact"
     if not code:
         raise HTTPException(status_code=400, detail="No code found in message content")
 
     # Generate script using LLM
     try:
-        ai_response = llm_service.generate_script_from_code(code, mode)
+        ai_response = llm_service.generate_script_from_code(code, video_duration, mode)
         return ai_response
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to generate script: {str(e)}")

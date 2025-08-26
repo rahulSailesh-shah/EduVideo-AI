@@ -17,7 +17,8 @@ def create_video(db: Session, video: VideoCreate) -> Video:
         video_url=video.video_url,
         message_id=video.message_id,
         created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        updated_at=datetime.utcnow(),
+        duration=video.duration
     )
 
     db.add(db_video)

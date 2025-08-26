@@ -8,11 +8,13 @@ from datetime import datetime
 class VideoBase(BaseModel):
   chat_id: str
   video_url: Optional[str] = None
+  duration: int = 0
 
 class VideoCreate(VideoBase):
   chat_id: int
   video_url: Optional[str] = None
   message_id: int
+
 
 class VideoUpdate(VideoBase):
   video_url: Optional[str] = None

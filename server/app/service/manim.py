@@ -155,7 +155,12 @@ class ManimService:
                     with open(video_path, 'rb') as video_file:
                         video_bytes = video_file.read()
                         video_b64 = base64.b64encode(video_bytes).decode('utf-8')
-                    return video_b64, video_bytes, size_mb
+                    result = subprocess.run([
+                            'ffprobe', '-v', 'quiet', '-show_entries',
+                            'format=duration', '-of', 'csv=p=0', str(video_path)
+                        ], capture_output=True, text=True)
+                    duration = float(result.stdout.strip())
+                    return video_b64, video_bytes, duration
                 finally:
                     self.cleanup_media_files(script_filename)
 

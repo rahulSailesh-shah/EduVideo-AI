@@ -181,50 +181,6 @@ class LLMService:
         self.client = OpenAI(api_key=api_key, base_url=base_url)
         self.gemini_client = genai.Client(api_key=api_key)
 
-    def estimate_video_duration(self, code: str) -> float:
-        duration = 0.0
-
-        # Find all wait() calls
-        wait_pattern = r'self\.wait\((\d*\.?\d*)\)'
-        waits = re.findall(wait_pattern, code)
-        for wait_time in waits:
-            if wait_time:
-                duration += float(wait_time)
-            else:
-                duration += 1.0  # Default wait time
-
-        # Find all animations with run_time
-        runtime_pattern = r'run_time=(\d*\.?\d*)'
-        runtimes = re.findall(runtime_pattern, code)
-        for runtime in runtimes:
-            duration += float(runtime)
-
-        # Count animations without explicit run_time (default 1 second each)
-        animation_patterns = [
-            r'self\.play\([^)]+\)',
-            r'Create\(',
-            r'Write\(',
-            r'FadeIn\(',
-            r'FadeOut\(',
-            r'Transform\(',
-        ]
-
-        total_animations = 0
-        for pattern in animation_patterns:
-            # Count non-overlapping matches
-            matches = len(re.findall(pattern, code))
-            total_animations += matches
-
-        # Subtract animations that already have run_time specified
-        animations_with_runtime = len(runtimes)
-        default_animations = total_animations - animations_with_runtime
-        duration += default_animations * 0.5
-        # Add buffer for complex scenes
-        if 'MathTex' in code or 'Text' in code:
-            duration += 2.0
-
-        return max(duration, 10.0)  # Minimum 10 seconds
-
     def generate_speech_from_text(self, text: str):
         response = self.gemini_client.models.generate_content(
             model="gemini-2.5-flash-preview-tts",
@@ -249,12 +205,12 @@ class LLMService:
 
         return file_name
 
-    def generate_script_from_code(self, code: str, mode: str = "compact") -> str:
+    def generate_script_from_code(self, code: str, video_duration: int, mode: str = "compact") -> str:
         try:
             if mode not in ["compact", "detailed"]:
                 raise ValueError("Mode must be either 'compact' or 'detailed'")
 
-            system_content = self._get_system_prompt(mode, code)
+            system_content = self._get_system_prompt(mode, code, video_duration)
 
             response = self.client.chat.completions.create(
                 model=self.model,
@@ -283,7 +239,7 @@ class LLMService:
         except Exception as e:
             raise LLMGenerationError(f"Failed to generate script: {str(e)}") from e
 
-    def _get_system_prompt(self, mode: str, code: str) -> str:
+    def _get_system_prompt(self, mode: str, code: str, video_duration: int) -> str:
         """Generate appropriate system prompt based on user selection."""
 
         base_instructions = (
@@ -297,13 +253,12 @@ class LLMService:
         )
 
         if mode == "compact":
-            target_duration = self.estimate_video_duration(code)
             words_per_minute = 110
-            target_words = int((target_duration / 60) * words_per_minute)
+            target_words = int((video_duration / 60) * words_per_minute)
 
             return (
                 f"{base_instructions} "
-                f"TIMING CONSTRAINT: Write approximately {target_words} words to match a {target_duration:.1f} second video. "
+                f"TIMING CONSTRAINT: Write approximately {target_words} words to match a {video_duration:.1f} second video. "
                 "Keep the explanation concise and well-paced to align with the visual progression. "
                 "Prioritize the most essential points that can be effectively communicated within the time limit. "
                 "Ensure smooth transitions between concepts to maintain engagement throughout the duration."

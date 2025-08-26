@@ -1,4 +1,4 @@
-
+import math
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
@@ -38,16 +38,14 @@ def _generate_video_with_retry(
     current_user: User,
     max_retries: int = 1
 ) -> VideoResponse:
-
     for attempt in range(max_retries + 1):
         try:
-            video_b64, video_bytes, size_mb = manim_service.generate_video(code)
+            video_b64, video_bytes, duration = manim_service.generate_video(code)
             s3_url = s3_upload_service.upload_video(
                 video_bytes,
                 username=current_user.username,
                 chat_id=chat_id
             )
-
             ai_message = MessageCreate(
                 content=code,
                 role="assistant",
@@ -59,7 +57,8 @@ def _generate_video_with_retry(
             generated_video = VideoCreate(
                 chat_id=chat_id,
                 video_url=s3_url,
-                message_id=ai_response.id
+                message_id=ai_response.id,
+                duration=math.ceil(duration) or 0
             )
             new_video = create_video(db=db, video=generated_video)
             print(f"Video created with ID: {new_video.id}, URL: {new_video.video_url}, Message ID: {new_video.message_id}")
