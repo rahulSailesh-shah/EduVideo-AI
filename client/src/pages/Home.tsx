@@ -21,7 +21,7 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { toast } = useToast();
-  const { token, isAuthenticated, user } = useAuth();
+  const { token, isAuthenticated, user, logout } = useAuth();
 
   useEffect(() => {
     if (!isAuthenticated || !token) {
@@ -44,6 +44,8 @@ const Home = () => {
             title: "Error",
             description: "Failed to load projects.",
           });
+          logout();
+          navigate("/");
           return;
         }
         const data = await res.json();
@@ -54,12 +56,14 @@ const Home = () => {
           title: "Error",
           description: "Failed to load projects.",
         });
+        logout();
+        navigate("/");
       } finally {
         setIsLoading(false);
       }
     };
     fetchProjects();
-  }, [toast, token, isAuthenticated, user]);
+  }, [toast, token, isAuthenticated, user, logout, navigate]);
 
   const handleCreateNew = async () => {
     if (!isAuthenticated || !token) {

@@ -104,7 +104,7 @@ export const Navbar = ({ onCreateNew, onBack, showBack }: NavbarProps) => {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="gap-2 hover:bg-blue-lightest/50 dark:hover:bg-blue-medium/20 transition-colors duration-200 rounded-lg px-3 h-9"
+                  className="gap-2 hover:bg-blue-lightest/50 hover:text-blue-dark dark:hover:text-blue-lightest dark:hover:bg-blue-medium/20 transition-colors duration-200 rounded-lg px-3 h-9"
                 >
                   <div className="w-6 h-6 bg-blue-medium/20 rounded-full flex items-center justify-center">
                     <User className="w-3 h-3 text-blue-medium" />

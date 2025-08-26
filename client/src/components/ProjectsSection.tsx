@@ -100,15 +100,17 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
       </div>
 
       {/* Create New Project Button */}
-      <div className="mb-6">
-        <Button
-          onClick={onCreateNew}
-          className="bg-blue-medium hover:bg-blue-dark text-white px-8 py-4 h-auto text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-0"
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          Create New Project
-        </Button>
-      </div>
+      {projects.length > 0 && (
+        <div className="mb-6">
+          <Button
+            onClick={onCreateNew}
+            className="bg-blue-medium hover:bg-blue-dark text-white px-8 py-4 h-auto text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Create New Project
+          </Button>
+        </div>
+      )}
 
       {/* Projects Grid */}
       {projects.length > 0 ? (
@@ -242,38 +244,56 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
 
       {/* Delete Confirmation Modal */}
       <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader className="space-y-4">
-            <div className="flex items-center justify-center w-12 h-12 bg-destructive/10 rounded-full mx-auto">
-              <AlertTriangle className="w-6 h-6 text-destructive" />
+        <DialogContent className="sm:max-w-lg border-0 shadow-2xl rounded-3xl overflow-hidden bg-gradient-to-br from-background to-muted/20">
+          {/* Modern header with enhanced visual hierarchy */}
+          <DialogHeader className="space-y-6 pt-8 pb-6 px-8">
+            {/* Enhanced icon with gradient background */}
+            <div className="relative flex items-center justify-center w-20 h-20 mx-auto">
+              <div className="absolute inset-0 bg-gradient-to-br from-red-500/20 to-destructive/30 rounded-full blur-sm"></div>
+              <div className="relative flex items-center justify-center w-16 h-16 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/50 dark:to-red-900/50 rounded-2xl border border-red-200/50 dark:border-red-800/50">
+                <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
+              </div>
             </div>
-            <DialogTitle className="text-center text-xl font-semibold">
-              Delete Project
-            </DialogTitle>
-            <DialogDescription className="text-center text-base">
-              Are you sure you want to delete "{projectToDelete?.title}"?
-              <br />
-              <span className="text-sm text-muted-foreground mt-2 block">
-                This action cannot be undone.
-              </span>
-            </DialogDescription>
+
+            {/* Enhanced typography with better spacing */}
+            <div className="space-y-3">
+              <DialogTitle className="text-center text-2xl font-bold tracking-tight bg-gradient-to-br from-foreground to-foreground/80 bg-clip-text">
+                Delete Project?
+              </DialogTitle>
+              <DialogDescription className="text-center text-base leading-relaxed space-y-3">
+                <div className="text-foreground/90">
+                  You're about to permanently delete{" "}
+                  <span className="font-semibold text-foreground px-2 py-1 bg-muted/50 rounded-md">
+                    {projectToDelete?.title}
+                  </span>
+                </div>
+                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-800/30 rounded-xl px-4 py-3">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                  <span>This action cannot be undone</span>
+                </div>
+              </DialogDescription>
+            </div>
           </DialogHeader>
-          <DialogFooter className="flex flex-col sm:flex-row gap-3 sm:gap-2">
-            <Button
-              variant="outline"
-              onClick={handleCancelDelete}
-              className="w-full sm:w-auto"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleConfirmDelete}
-              className="w-full sm:w-auto"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete Project
-            </Button>
+
+          {/* Enhanced footer with improved button design */}
+          <DialogFooter className="px-8 pb-8 pt-2">
+            <div className="flex flex-col sm:flex-row gap-3 w-full">
+              <Button
+                variant="secondary"
+                onClick={handleCancelDelete}
+                className="flex-1 sm:flex-none sm:min-w-[120px] h-12 rounded-xl border-2 border-border hover:border-blue-medium/50  dark:hover:bg-blue-950/20 font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleConfirmDelete}
+                className="flex-1 sm:flex-none sm:min-w-[140px] h-12 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 dark:from-red-600 dark:to-red-700 dark:hover:from-red-700 dark:hover:to-red-800 font-medium shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] border-0"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete Forever
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
