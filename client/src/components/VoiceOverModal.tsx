@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { VideoData } from "@/pages/Project";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,6 +31,7 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [loadingVoiceOver, setLoadingVoiceOver] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
+  const [detailedMode, setDetailedMode] = useState(false);
   const { toast } = useToast();
   const { token, isAuthenticated } = useAuth();
 
@@ -69,7 +72,10 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(selectedVideo),
+        body: JSON.stringify({
+          ...selectedVideo,
+          mode: detailedMode ? "detailed" : "compact",
+        }),
       });
 
       if (!res.ok) {
@@ -180,25 +186,41 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
               <label className="text-sm font-medium text-foreground">
                 Voice Over Script
               </label>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleGenerateUsingAI}
-                disabled={loading || !selectedVideo}
-                className="h-8 px-3 text-xs"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-3 h-3 mr-2 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Bot className="w-3 h-3 mr-2" />
-                    Generate with AI
-                  </>
-                )}
-              </Button>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="detailed-mode"
+                    checked={detailedMode}
+                    onCheckedChange={setDetailedMode}
+                    disabled={loading}
+                  />
+                  <Label
+                    htmlFor="detailed-mode"
+                    className="text-xs text-muted-foreground cursor-pointer"
+                  >
+                    Detailed
+                  </Label>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGenerateUsingAI}
+                  disabled={loading || !selectedVideo}
+                  className="h-8 px-3 text-xs"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Bot className="w-3 h-3 mr-2" />
+                      Generate with AI
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
 
             {loading ? (
@@ -259,10 +281,6 @@ export const VoiceOverModal: React.FC<VoiceOverModalProps> = ({
         {/* Footer */}
         {!loadingVoiceOver && (
           <div className="flex items-center justify-between p-6 border-t border-border/50 bg-muted/10 rounded-b-3xl">
-            <p className="text-xs text-muted-foreground">
-              AI will convert your text to natural speech and merge it with the
-              video
-            </p>
             <div className="flex items-center gap-3">
               <Button variant="outline" onClick={onClose}>
                 Cancel

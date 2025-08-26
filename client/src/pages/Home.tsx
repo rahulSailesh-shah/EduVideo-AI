@@ -40,10 +40,6 @@ const Home = () => {
           }
         );
         if (!res.ok) {
-          toast({
-            title: "Error",
-            description: "Failed to load projects.",
-          });
           logout();
           navigate("/");
           return;

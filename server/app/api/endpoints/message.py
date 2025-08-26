@@ -29,6 +29,75 @@ llm_service = LLMService(
 
 s3_upload_service = S3UploadService()
 
+def _generate_video_with_retry(
+    code: str,
+    original_content: str,
+    prompt_session: PromptSession,
+    chat_id: int,
+    db: Session,
+    current_user: User,
+    max_retries: int = 1
+) -> VideoResponse:
+
+    for attempt in range(max_retries + 1):
+        try:
+            video_b64, video_bytes, size_mb = manim_service.generate_video(code)
+            s3_url = s3_upload_service.upload_video(
+                video_bytes,
+                username=current_user.username,
+                chat_id=chat_id
+            )
+
+            ai_message = MessageCreate(
+                content=code,
+                role="assistant",
+                chat_id=chat_id,
+                video_url=s3_url
+            )
+            ai_response = create_message(db=db, message=ai_message)
+
+            generated_video = VideoCreate(
+                chat_id=chat_id,
+                video_url=s3_url,
+                message_id=ai_response.id
+            )
+            new_video = create_video(db=db, video=generated_video)
+            print(f"Video created with ID: {new_video.id}, URL: {new_video.video_url}, Message ID: {new_video.message_id}")
+
+            return VideoResponse(
+                text=ai_response,
+                video_response=new_video,
+            )
+
+        except ManimGenerationError as e:
+            if attempt == max_retries:
+                # Final attempt failed
+                raise HTTPException(
+                    status_code=422,
+                    detail={
+                        "error": "Video generation failed after retry",
+                        "detail": str(e),
+                        "error_code": "MANIM_GENERATION_ERROR_RETRY"
+                    }
+                )
+
+            # Prepare for retry
+            print(f"Error generating video (attempt {attempt + 1}): {e}")
+            print(f"Original message content: {original_content}")
+
+            error_message = f"Video generation failed: {str(e)}. Please fix the code and try again."
+            reprompt_content = f"{original_content}\n\n{error_message}"
+
+            try:
+                code = llm_service.generate_manim_code(reprompt_content, prompt_session)
+                print(f"[server] Regenerated code (attempt {attempt + 2}): {code}")
+            except Exception as llm_error:
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"LLM regeneration failed: {str(llm_error)}"
+                )
+
+
 @router.post("/", response_model=VideoResponse)
 def create_message_endpoint(message: MessageCreate,
                             db: Session = Depends(get_db),
@@ -47,68 +116,17 @@ def create_message_endpoint(message: MessageCreate,
 
         try:
             generated_code = llm_service.generate_manim_code(message.content, prompt_session)
+            print(f"[server] Generated code: {generated_code}")
 
+            return _generate_video_with_retry(
+                code=generated_code,
+                original_content=message.content,
+                prompt_session=prompt_session,
+                chat_id=message.chat_id,
+                db=db,
+                current_user=current_user
+            )
 
-            try:
-                video_b64, video_bytes, size_mb = manim_service.generate_video(generated_code)
-                s3_url = s3_upload_service.upload_video(video_bytes, username=current_user.username, chat_id=message.chat_id)
-                ai_message = MessageCreate(
-                    content=generated_code,
-                    role="assistant",
-                    chat_id=message.chat_id,
-                    video_url=s3_url
-                )
-                ai_response = create_message(db=db, message=ai_message)
-
-                generated_video = VideoCreate(
-                    chat_id=message.chat_id,
-                    video_url=s3_url,
-                    message_id=ai_response.id
-                )
-                new_video = create_video(db=db, video=generated_video)
-                print(f"Video created with ID: {new_video.id}, URL: {new_video.video_url}, Message ID: {new_video.message_id}")
-
-                return VideoResponse(
-                    text=ai_response,
-                    video_response=new_video,
-                )
-
-            except ManimGenerationError as e:
-                # Reprompt LLM with error included
-                # print(f"Error generating video: {e}")
-                # print(f"Original message content: {message.content}")
-                # error_message = f"Video generation failed: {str(e)}. Please fix the code and try again."
-                # reprompt_content = f"{message.content}\n\n{error_message}"
-                # try:
-                #     regenerated_code = llm_service.generate_manim_code(reprompt_content, prompt_session)
-                #     ai_message_retry = MessageCreate(
-                #         content=regenerated_code,
-                #         role="assistant",
-                #         chat_id=message.chat_id
-                #     )
-                #     ai_response_retry = create_message(db=db, message=ai_message_retry)
-                #     video_data_retry, video_size_mb_retry = manim_service.generate_video(regenerated_code)
-                #     return VideoResponse(
-                #         text=ai_response_retry,
-                #         video_data=video_data_retry,
-                #     )
-                # except ManimGenerationError as e2:
-                #     raise HTTPException(
-                #         status_code=422,
-                #         detail={
-                #             "error": "Video generation failed after retry",
-                #             "detail": str(e2),
-                #             "error_code": "MANIM_GENERATION_ERROR_RETRY"
-                #         }
-                #     )
-                raise HTTPException(
-                        status_code=422,
-                        detail={
-                            "error": "Video generation failed after retry",
-                            "detail": str(e2),
-                            "error_code": "MANIM_GENERATION_ERROR_RETRY"
-                        }
-                    )
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 

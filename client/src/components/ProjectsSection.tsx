@@ -289,7 +289,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
 
           {/* Enhanced footer with improved button design */}
           <DialogFooter className="px-8 pb-8 pt-2">
-            <div className="flex justify-end flex-col sm:flex-row gap-3 w-full">
+            <div className="flex flex-col sm:flex-row gap-3 w-full">
               <Button
                 variant="outline"
                 onClick={handleCancelDelete}

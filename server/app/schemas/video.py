@@ -29,6 +29,9 @@ class Video(VideoBase):
   class Config:
     from_attributes = True
 
+class VideoDataWithMode(Video):
+    mode: Optional[str] = "compact"
+
 
 class VideoResponse(BaseModel):
     text: Message

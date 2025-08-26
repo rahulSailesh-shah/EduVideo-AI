@@ -92,6 +92,9 @@ class ManimService:
                 cwd=str(self.scripts_dir)
             )
 
+            print(f"Docker command stdout: {result.stdout}")
+            print(f"Docker command stderr: {result.stderr}")
+
             if result.returncode != 0:
                 error_msg = f"Docker command failed with return code {result.returncode}"
                 if result.stderr:

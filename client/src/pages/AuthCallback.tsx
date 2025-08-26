@@ -59,13 +59,6 @@ const AuthCallback: React.FC = () => {
         if (userResponse.ok) {
           const userData = await userResponse.json();
           login(data.access_token, userData);
-
-          toast({
-            title: "Success",
-            description: "Successfully logged in with Google!",
-          });
-
-          // Redirect to home page
           navigate("/");
         } else {
           throw new Error("Failed to get user information");
