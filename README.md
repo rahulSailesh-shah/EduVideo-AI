@@ -1,3 +1,9 @@
+# Demo Video
+
+Watch a demo of the project here:
+
+[![Demo Video](https://drive.google.com/file/d/1M5AR6pRcavOwtwEHuxxilfjGT03w6m2w/view?usp=sharing)](https://drive.google.com/file/d/18MGKPrNjHCtFnitiacK9q8H_95TjGIop/view?usp=sharing)
+
 # Vistruct - AI-Powered Visual Instruction Platform
 
 A full-stack web application that enables users to create engaging educational videos using AI-powered visual instruction. The platform combines video processing, AI chat interactions, automated video creation, and AI voice-over generation to streamline educational content production. Users can generate complete educational content including scripts, voice-overs, and visual animations through an intuitive chat interface.
@@ -208,7 +214,6 @@ The platform uses Manim for video generation and AI for content creation:
 4. **Content Customization**: Tailor content for different educational levels and subjects
 5. **Timeout Handling**: Automatic timeout for long-running renders
 6. **File Management**: Automatic cleanup of temporary files
-
 
 ## 🤝 Contributing
 
