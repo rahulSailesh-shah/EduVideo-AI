@@ -2,7 +2,7 @@
 
 Watch a demo of the project here:
 
-[![Demo Video](https://drive.google.com/file/d/1M5AR6pRcavOwtwEHuxxilfjGT03w6m2w/view?usp=sharing)](https://drive.google.com/file/d/18MGKPrNjHCtFnitiacK9q8H_95TjGIop/view?usp=sharing)
+[![Demo Video](https://drive.google.com/uc?export=view&id=1M5AR6pRcavOwtwEHuxxilfjGT03w6m2w)](https://drive.google.com/file/d/18MGKPrNjHCtFnitiacK9q8H_95TjGIop/view?usp=sharing)
 
 # Vistruct - AI-Powered Visual Instruction Platform
 
